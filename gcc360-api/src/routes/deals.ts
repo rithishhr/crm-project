@@ -1,11 +1,11 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 
 export const dealsRouter = Router()
 dealsRouter.use(authenticate)
 
-dealsRouter.get('/', async (req: AuthRequest, res) => {
+dealsRouter.get('/', async (req: AuthRequest, res: Response) => {
   const deals = await prisma.deal.findMany({
     where: { companyId: req.user!.companyId },
     orderBy: { createdAt: 'desc' },
@@ -13,7 +13,7 @@ dealsRouter.get('/', async (req: AuthRequest, res) => {
   res.json(deals)
 })
 
-dealsRouter.post('/', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+dealsRouter.post('/', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   const { title, company, value, stage, closedDate, clientId } = req.body
   if (!title || !company || !value) { res.status(400).json({ error: 'Title, company, and value are required.' }); return }
   const deal = await prisma.deal.create({
@@ -30,7 +30,7 @@ dealsRouter.post('/', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, 
   res.status(201).json(deal)
 })
 
-dealsRouter.patch('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+dealsRouter.patch('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   const fields = ['title', 'company', 'stage', 'clientId']
   const data: Record<string, unknown> = {}
   for (const f of fields) { if (req.body[f] !== undefined) data[f] = req.body[f] }
@@ -41,13 +41,13 @@ dealsRouter.patch('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthReque
 })
 
 // ── DELETE /api/deals/:id ──────────────────────────────────────────────────────
-dealsRouter.delete('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+dealsRouter.delete('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   await prisma.deal.delete({ where: { id: req.params.id } })
   res.json({ success: true })
 })
 
 // ── DELETE /api/deals/bulk ─────────────────────────────────────────────────────
-dealsRouter.delete('/bulk', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+dealsRouter.delete('/bulk', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   const { ids } = req.body
   if (!ids || !Array.isArray(ids)) {
     res.status(400).json({ error: 'IDs array is required.' })

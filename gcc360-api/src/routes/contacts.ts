@@ -1,11 +1,11 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 
 export const contactsRouter = Router()
 contactsRouter.use(authenticate)
 
-contactsRouter.get('/', async (req: AuthRequest, res) => {
+contactsRouter.get('/', async (req: AuthRequest, res: Response) => {
   const contacts = await prisma.contact.findMany({
     where:   { companyId: req.user!.companyId },
     include: { clientRef: { select: { id: true, name: true } } },
@@ -14,7 +14,7 @@ contactsRouter.get('/', async (req: AuthRequest, res) => {
   res.json(contacts)
 })
 
-contactsRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res) => {
+contactsRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res: Response) => {
   const { firstName, lastName, clientId, jobTitle, department,
           email, phone, mobile, ownerId, status, company, notes, tags } = req.body
 
@@ -51,7 +51,7 @@ contactsRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: A
   res.status(201).json(contact)
 })
 
-contactsRouter.patch('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res) => {
+contactsRouter.patch('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res: Response) => {
   const fields = ['firstName', 'lastName', 'clientId', 'jobTitle', 'department',
     'email', 'phone', 'mobile', 'ownerId', 'status', 'company', 'notes', 'tags']
   const data: Record<string, unknown> = {}
@@ -61,13 +61,13 @@ contactsRouter.patch('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (re
   res.json(contact)
 })
 
-contactsRouter.delete('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+contactsRouter.delete('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   await prisma.contact.delete({ where: { id: req.params.id } })
   res.json({ success: true })
 })
 
 // ── DELETE /api/contacts/bulk ──────────────────────────────────────────────────
-contactsRouter.delete('/bulk', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+contactsRouter.delete('/bulk', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   const { ids } = req.body
   if (!ids || !Array.isArray(ids)) {
     res.status(400).json({ error: 'IDs array is required.' })
