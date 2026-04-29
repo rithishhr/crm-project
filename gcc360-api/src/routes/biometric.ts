@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import BiometricService from "../services/biometricService";
+import { AuthRequest } from "../middleware/auth";
 import authMiddleware from "../middleware/auth";
 
 const router = Router();
@@ -11,7 +12,7 @@ const prisma = new PrismaClient();
  * Enroll user's face for biometric authentication
  * Body: { userId, faceDescriptor: number[], confidence: number }
  */
-router.post("/enroll", authMiddleware, async (req: Request, res: Response) => {
+router.post("/enroll", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { userId, faceDescriptor, confidence } = req.body;
 
@@ -101,7 +102,7 @@ router.post("/authenticate", async (req: Request, res: Response) => {
 router.post(
   "/verify",
   authMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const { userId, faceDescriptor } = req.body;
 
@@ -135,7 +136,7 @@ router.post(
 router.get(
   "/status/:userId",
   authMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const { userId } = req.params;
 
@@ -169,7 +170,7 @@ router.get(
 router.delete(
   "/disable",
   authMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
 

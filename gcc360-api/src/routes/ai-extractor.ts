@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import multer from 'multer'
 import { authenticate, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
@@ -23,7 +23,7 @@ function getGroq() {
   return new Groq({ apiKey: key })
 }
 
-aiExtractorRouter.post('/extract-file', upload.single('file'), async (req: AuthRequest, res) => {
+aiExtractorRouter.post('/extract-file', upload.single('file'), async (req: AuthRequest, res: Response) => {
   try {
     const file = req.file
     if (!file) {

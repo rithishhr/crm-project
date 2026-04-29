@@ -3,6 +3,7 @@ import multer from "multer";
 import * as path from "path";
 import * as fs from "fs";
 import AILeadIngestionService from "../services/aiLeadIngestionService";
+import { AuthRequest } from "../middleware/auth";
 import authMiddleware from "../middleware/auth";
 
 const router = Router();
@@ -59,7 +60,7 @@ router.post(
   "/upload",
   authMiddleware,
   upload.single("document"),
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({
@@ -115,7 +116,7 @@ router.post(
   "/batch",
   authMiddleware,
   upload.array("documents", 10),
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       if (!req.files || req.files.length === 0) {
         return res.status(400).json({
@@ -169,7 +170,7 @@ router.post(
   "/extract-text",
   authMiddleware,
   upload.single("document"),
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({
@@ -205,7 +206,7 @@ router.post(
 router.post(
   "/extract-lead-data",
   authMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const { documentText, companyContext } = req.body;
 
@@ -256,7 +257,7 @@ router.post(
 router.post(
   "/verify-lead",
   authMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const { leadData } = req.body;
 
@@ -291,7 +292,7 @@ router.post(
 router.post(
   "/custom-extract",
   authMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const { documentText, customPrompt } = req.body;
 

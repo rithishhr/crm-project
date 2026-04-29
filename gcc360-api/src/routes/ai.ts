@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, AuthRequest } from '../middleware/auth'
 import Groq from 'groq-sdk'
 import { MODELS } from '../lib/aiUtils'
@@ -17,7 +17,7 @@ function getGroq() {
   return _groq
 }
 
-aiRouter.get('/status', async (req: AuthRequest, res) => {
+aiRouter.get('/status', async (req: AuthRequest, res: Response) => {
   res.json({ configured: !!process.env.GROQ_API_KEY })
 })
 
@@ -43,7 +43,7 @@ function percentageChange(current: number, previous: number) {
   return ((current - previous) / previous) * 100
 }
 
-aiRouter.get('/agent/dashboard-summary', async (req: AuthRequest, res) => {
+aiRouter.get('/agent/dashboard-summary', async (req: AuthRequest, res: Response) => {
   try {
     const companyId = req.user?.companyId
     const userId = req.user?.userId
@@ -312,7 +312,7 @@ aiRouter.get('/agent/dashboard-summary', async (req: AuthRequest, res) => {
   }
 })
 
-aiRouter.get('/agent/dashboard-summary/pdf', async (req: AuthRequest, res) => {
+aiRouter.get('/agent/dashboard-summary/pdf', async (req: AuthRequest, res: Response) => {
   try {
     const companyId = req.user?.companyId
     const userId = req.user?.userId
@@ -393,7 +393,7 @@ aiRouter.get('/agent/dashboard-summary/pdf', async (req: AuthRequest, res) => {
   }
 })
 
-aiRouter.get('/agent/admin-insights', async (req: AuthRequest, res) => {
+aiRouter.get('/agent/admin-insights', async (req: AuthRequest, res: Response) => {
   try {
     const companyId = req.user?.companyId
     const role = String(req.user?.role || '').toUpperCase()
@@ -515,7 +515,7 @@ async function buildCompanyDataSummary(companyId: string) {
   }
 }
 
-aiRouter.get('/data-summary', async (req: AuthRequest, res) => {
+aiRouter.get('/data-summary', async (req: AuthRequest, res: Response) => {
   try {
     const companyId = req.user?.companyId
     if (!companyId) {
@@ -530,7 +530,7 @@ aiRouter.get('/data-summary', async (req: AuthRequest, res) => {
   }
 })
 
-aiRouter.get('/data-insights', async (req: AuthRequest, res) => {
+aiRouter.get('/data-insights', async (req: AuthRequest, res: Response) => {
   try {
     const companyId = req.user?.companyId
     if (!companyId) {
@@ -574,7 +574,7 @@ aiRouter.get('/data-insights', async (req: AuthRequest, res) => {
   }
 })
 
-aiRouter.post('/data-query', async (req: AuthRequest, res) => {
+aiRouter.post('/data-query', async (req: AuthRequest, res: Response) => {
   try {
     const companyId = req.user?.companyId
     if (!companyId) {
@@ -745,7 +745,7 @@ Contact details:
   throw new Error('Unsupported record type')
 }
 
-aiRouter.post('/draft-email', async (req: AuthRequest, res) => {
+aiRouter.post('/draft-email', async (req: AuthRequest, res: Response) => {
   try {
     const { recordId, recordType, purpose } = req.body || {}
 

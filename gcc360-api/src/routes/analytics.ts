@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 
@@ -7,7 +7,7 @@ analyticsRouter.use(authenticate)
 
 // ── GET /api/analytics/dashboard ──────────────────────────────────────────────
 // Returns all KPIs needed for the dashboard
-analyticsRouter.get('/dashboard', async (req: AuthRequest, res) => {
+analyticsRouter.get('/dashboard', async (req: AuthRequest, res: Response) => {
   const { companyId } = req.user!
 
   const [totalLeads, qualifiedLeads, opportunities, deals, clients, tasks, invoices] = await Promise.all([
@@ -50,7 +50,7 @@ analyticsRouter.get('/dashboard', async (req: AuthRequest, res) => {
 })
 
 // ── GET /api/analytics/pipeline ────────────────────────────────────────────────
-analyticsRouter.get('/pipeline', async (req: AuthRequest, res) => {
+analyticsRouter.get('/pipeline', async (req: AuthRequest, res: Response) => {
   const opps = await prisma.opportunity.findMany({
     where: { companyId: req.user!.companyId },
     select: { stage: true, value: true, probability: true, company: true, title: true, closeDate: true },
@@ -60,7 +60,7 @@ analyticsRouter.get('/pipeline', async (req: AuthRequest, res) => {
 })
 
 // ── GET /api/analytics/revenue ─────────────────────────────────────────────────
-analyticsRouter.get('/revenue', async (req: AuthRequest, res) => {
+analyticsRouter.get('/revenue', async (req: AuthRequest, res: Response) => {
   const invoices = await prisma.invoice.findMany({
     where: { companyId: req.user!.companyId },
     orderBy: { createdAt: 'asc' },
@@ -82,7 +82,7 @@ analyticsRouter.get('/revenue', async (req: AuthRequest, res) => {
 })
 
 // ── GET /api/analytics/leads ───────────────────────────────────────────────────
-analyticsRouter.get('/leads', async (req: AuthRequest, res) => {
+analyticsRouter.get('/leads', async (req: AuthRequest, res: Response) => {
   const leads = await prisma.lead.findMany({
     where:  { companyId: req.user!.companyId },
     select: { status: true, source: true, aiCredibilityScore: true, createdAt: true, value: true },
@@ -102,7 +102,7 @@ analyticsRouter.get('/leads', async (req: AuthRequest, res) => {
 })
 
 // ── GET /api/analytics/team ────────────────────────────────────────────────────
-analyticsRouter.get('/team', async (req: AuthRequest, res) => {
+analyticsRouter.get('/team', async (req: AuthRequest, res: Response) => {
   const users = await prisma.user.findMany({
     where: { companyId: req.user!.companyId, role: { in: ['SALESPERSON', 'SALES_MANAGER'] } },
     select: { id: true, name: true },

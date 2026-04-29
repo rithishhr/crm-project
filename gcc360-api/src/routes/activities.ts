@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 
@@ -6,7 +6,7 @@ import { prisma } from '../lib/prisma'
 export const activitiesRouter = Router()
 activitiesRouter.use(authenticate)
 
-activitiesRouter.get('/', async (req: AuthRequest, res) => {
+activitiesRouter.get('/', async (req: AuthRequest, res: Response) => {
   const activities = await prisma.activity.findMany({
     where:   { companyId: req.user!.companyId },
     include: { createdBy: { select: { id: true, name: true } } },
@@ -16,7 +16,7 @@ activitiesRouter.get('/', async (req: AuthRequest, res) => {
   res.json(activities)
 })
 
-activitiesRouter.post('/', requireRole('ADMIN', 'SALES_MANAGER', 'SALESPERSON'), async (req: AuthRequest, res) => {
+activitiesRouter.post('/', requireRole('ADMIN', 'SALES_MANAGER', 'SALESPERSON'), async (req: AuthRequest, res: Response) => {
   const { type, description, contact, company } = req.body
   if (!type || !description) { res.status(400).json({ error: 'Type and description are required.' }); return }
   const activity = await prisma.activity.create({

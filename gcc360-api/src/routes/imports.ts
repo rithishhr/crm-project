@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import multer from 'multer'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
@@ -75,7 +75,7 @@ function toNumber(value: string | undefined) {
   return Number.isFinite(parsed) ? parsed : 0
 }
 
-importsRouter.post('/:entity', requireRole('ADMIN'), upload.single('file'), async (req: AuthRequest, res) => {
+importsRouter.post('/:entity', requireRole('ADMIN'), upload.single('file'), async (req: AuthRequest, res: Response) => {
   try {
     const entity = req.params.entity
     if (!['leads', 'clients', 'contacts', 'users'].includes(entity)) {

@@ -1,11 +1,11 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 
 export const invoicesRouter = Router()
 invoicesRouter.use(authenticate)
 
-invoicesRouter.get('/', async (req: AuthRequest, res) => {
+invoicesRouter.get('/', async (req: AuthRequest, res: Response) => {
   const invoices = await prisma.invoice.findMany({
     where:   { companyId: req.user!.companyId },
     include: { client: { select: { id: true, name: true } } },
@@ -14,7 +14,7 @@ invoicesRouter.get('/', async (req: AuthRequest, res) => {
   res.json(invoices)
 })
 
-invoicesRouter.post('/', requireRole('ADMIN', 'FINANCE'), async (req: AuthRequest, res) => {
+invoicesRouter.post('/', requireRole('ADMIN', 'FINANCE'), async (req: AuthRequest, res: Response) => {
   const { invoiceNumber, amount, dueDate, clientId, items } = req.body
   if (!invoiceNumber || !amount || !dueDate || !clientId) {
     res.status(400).json({ error: 'Invoice number, amount, due date, and client are required.' })
@@ -26,7 +26,7 @@ invoicesRouter.post('/', requireRole('ADMIN', 'FINANCE'), async (req: AuthReques
   res.status(201).json(invoice)
 })
 
-invoicesRouter.patch('/:id/status', requireRole('ADMIN', 'FINANCE'), async (req: AuthRequest, res) => {
+invoicesRouter.patch('/:id/status', requireRole('ADMIN', 'FINANCE'), async (req: AuthRequest, res: Response) => {
   const { status } = req.body
   const upperStatus = (status || '').toUpperCase()
   
@@ -38,13 +38,13 @@ invoicesRouter.patch('/:id/status', requireRole('ADMIN', 'FINANCE'), async (req:
   res.json(invoice)
 })
 
-invoicesRouter.delete('/:id', requireRole('ADMIN', 'FINANCE'), async (req: AuthRequest, res) => {
+invoicesRouter.delete('/:id', requireRole('ADMIN', 'FINANCE'), async (req: AuthRequest, res: Response) => {
   await prisma.invoice.delete({ where: { id: req.params.id } })
   res.json({ success: true })
 })
 
 // ── DELETE /api/invoices/bulk ─────────────────────────────────────────────
-invoicesRouter.delete('/bulk', requireRole('ADMIN', 'FINANCE'), async (req: AuthRequest, res) => {
+invoicesRouter.delete('/bulk', requireRole('ADMIN', 'FINANCE'), async (req: AuthRequest, res: Response) => {
   const { ids } = req.body
   if (!ids || !Array.isArray(ids)) {
     res.status(400).json({ error: 'IDs array is required.' })

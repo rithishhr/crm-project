@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import EmailImportService from "../services/emailImportService";
+import { AuthRequest } from "../middleware/auth";
 import authMiddleware from "../middleware/auth";
 
 const router = Router();
@@ -11,7 +12,7 @@ const prisma = new PrismaClient();
  * Setup email integration (IMAP connection)
  * Body: { email, password, imapHost, imapPort }
  */
-router.post("/setup", authMiddleware, async (req: Request, res: Response) => {
+router.post("/setup", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { email, password, imapHost, imapPort } = req.body;
     const companyId = req.user?.companyId;
@@ -52,7 +53,7 @@ router.post("/setup", authMiddleware, async (req: Request, res: Response) => {
  * Manually trigger email sync
  * Body: { autoCreateLeads?: boolean }
  */
-router.post("/sync", authMiddleware, async (req: Request, res: Response) => {
+router.post("/sync", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { autoCreateLeads } = req.body;
 
@@ -81,7 +82,7 @@ router.post("/sync", authMiddleware, async (req: Request, res: Response) => {
 router.post(
   "/process-email",
   authMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const { from, to, subject, text, messageId, autoCreate } = req.body;
       const userId = req.user?.id;
@@ -133,7 +134,7 @@ router.post(
 router.post(
   "/fetch-emails",
   authMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const { maxEmails } = req.body;
       const companyId = req.user?.companyId;
@@ -198,7 +199,7 @@ router.post(
 router.post(
   "/test-connection",
   authMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const { email, password, imapHost, imapPort } = req.body;
 
@@ -236,7 +237,7 @@ router.post(
  * Get email import logs
  * Query: { limit, offset, status }
  */
-router.get("/logs", authMiddleware, async (req: Request, res: Response) => {
+router.get("/logs", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { limit = "20", offset = "0", status } = req.query;
     const companyId = req.user?.companyId;
@@ -284,7 +285,7 @@ router.get("/logs", authMiddleware, async (req: Request, res: Response) => {
  * Send email
  * Body: { to, subject, text, html }
  */
-router.post("/send", authMiddleware, async (req: Request, res: Response) => {
+router.post("/send", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { to, subject, text, html } = req.body;
 

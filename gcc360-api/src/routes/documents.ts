@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 import PDFDocument from 'pdfkit'
@@ -17,7 +17,7 @@ function getGroq() {
   return _groq
 }
 
-documentsRouter.get('/export/:dealId', async (req: AuthRequest, res) => {
+documentsRouter.get('/export/:dealId', async (req: AuthRequest, res: Response) => {
   try {
     const { dealId } = req.params
 
