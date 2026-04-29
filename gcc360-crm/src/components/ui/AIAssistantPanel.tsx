@@ -37,8 +37,14 @@ export default function AIAssistantPanel({ open, onClose, userName }: Props) {
   const [aiReady,   setAiReady]   = useState<boolean | null>(null)
 
   const authHeaders = () => {
-    const token = getToken() || ''
-    return token ? { Authorization: `Bearer ${token}` } : {}
+    const headers: Record<string, string> = {}
+    const token = getToken()
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+
+    return headers
   }
 
   const runQuery = async (text: string) => {
