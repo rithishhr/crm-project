@@ -72,96 +72,93 @@ export class EmailImportService {
       const emails: EmailData[] = [];
       let count = 0;
 
-      imap.openBox("INBOX", false, (err: Error | null, _mailbox: unknown) => {
-        if (err) {
-          imap.end();
-          reject(err);
-          return;
-        }
+      const scanMailbox = () => {
+        imap.openBox("INBOX", false, (err: Error | null, _mailbox: unknown) => {
+          if (err) {
+            imap.end();
+            reject(err);
+            return;
+          }
 
-        // Search for unread emails from last 24 hours
-        const oneDayAgo = new Date();
-        oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+          // Search for unread emails from last 24 hours
+          const oneDayAgo = new Date();
+          oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
-        imap.search(
-          ["UNSEEN", ["SINCE", oneDayAgo]],
-          (err: Error | null, results: number[]) => {
-            if (err) {
-              imap.end();
-              reject(err);
-              return;
-            }
+          imap.search(
+            ["UNSEEN", ["SINCE", oneDayAgo]],
+            (err: Error | null, results: number[]) => {
+              if (err) {
+                imap.end();
+                reject(err);
+                return;
+              }
 
-            if (!results || results.length === 0) {
-              imap.end();
-              resolve([]);
-              return;
-            }
+              if (!results || results.length === 0) {
+                imap.end();
+                resolve([]);
+                return;
+              }
 
-            const f = imap.fetch(results, { bodies: "" });
+              const f = imap.fetch(results, { bodies: "" });
 
-            f.on("message", (msg: any) => {
-              simpleParser(msg as any, async (err, parsed) => {
-                if (err) {
-                  console.error("Parse error:", err);
-                  return;
-                }
+              f.on("message", (msg: any) => {
+                simpleParser(msg as any, async (err, parsed) => {
+                  if (err) {
+                    console.error("Parse error:", err);
+                    return;
+                  }
 
-                const from = addressToText(parsed.from) || "unknown";
-                const to = addressToText(parsed.to);
-                const subject = parsed.subject || "[No Subject]";
-                const text = parsed.text || "";
-                const html = parsed.html || undefined;
+                  const from = addressToText(parsed.from) || "unknown";
+                  const to = addressToText(parsed.to);
+                  const subject = parsed.subject || "[No Subject]";
+                  const text = parsed.text || "";
+                  const html = parsed.html || undefined;
 
-                // Extract message ID from headers
-                const messageId = (parsed.messageId || `${Date.now()}@email`).replace(
-                  /[<>]/g,
-                  ""
-                );
+                  // Extract message ID from headers
+                  const messageId = (parsed.messageId || `${Date.now()}@email`).replace(
+                    /[<>]/g,
+                    ""
+                  );
 
-                emails.push({
-                  from,
-                  to,
-                  subject,
-                  text: text.substring(0, 5000), // Limit text length
-                  html,
-                  messageId,
+                  emails.push({
+                    from,
+                    to,
+                    subject,
+                    text: text.substring(0, 5000), // Limit text length
+                    html,
+                    messageId,
+                  });
+
+                  count++;
+                  if (count >= maxEmails) {
+                    imap.end();
+                  }
                 });
+              });
 
-                count++;
-                if (count >= maxEmails) {
+              f.on("error", (err: Error) => {
+                imap.end();
+                reject(err);
+              });
+
+              f.on("end", () => {
+                if (count < maxEmails) {
                   imap.end();
                 }
               });
-            });
+            }
+          );
+        });
+      };
 
-            f.on("error", (err: Error) => {
-              imap.end();
-              reject(err);
-            });
-
-            f.on("end", () => {
-              if (count < maxEmails) {
-                imap.end();
-              }
-            });
-          }
-        );
-      });
-
-      imap.on("error", (err: Error) => {
+      imap.once("ready", scanMailbox);
+      imap.once("error", (err: Error) => {
         reject(err);
       });
-
-      imap.on("end", () => {
+      imap.once("end", () => {
         resolve(emails);
       });
-
-      imap.openBox("INBOX", false, (err: Error | null) => {
-        if (err) {
-          reject(err);
-        }
-      });
+      imap.connect();
     });
   }
 
@@ -512,17 +509,17 @@ Content: ${emailData.text}`;
   }> {
     try {
       const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || "587"),
-        secure: process.env.SMTP_SECURE === "true",
+        host: process.env.SMTP_HOST || process.env.MAIL_HOST,
+        port: parseInt(process.env.SMTP_PORT || process.env.MAIL_PORT || "587"),
+        secure: (process.env.SMTP_SECURE || "false") === "true",
         auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASSWORD,
+          user: process.env.SMTP_USER || process.env.MAIL_USER,
+          pass: process.env.SMTP_PASSWORD || process.env.MAIL_PASS,
         },
       });
 
       await transporter.sendMail({
-        from: process.env.SMTP_FROM,
+        from: process.env.SMTP_FROM || process.env.MAIL_FROM || process.env.MAIL_USER,
         to,
         subject,
         text,
