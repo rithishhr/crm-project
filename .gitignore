@@ -6,7 +6,6 @@ node_modules/
 /.vscode/
 **/dist
 **/build
-**/public/models
 **/uploads
 *.log
 cleanup-report.txt
