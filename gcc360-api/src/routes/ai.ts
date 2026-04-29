@@ -100,9 +100,9 @@ aiRouter.get('/agent/dashboard-summary', async (req: AuthRequest, res) => {
           companyId,
           dueDate: { gte: now, lt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) },
           OR: [
-            { title: { contains: 'meeting', mode: 'insensitive' } },
-            { relatedTo: { contains: 'meeting', mode: 'insensitive' } },
-            { title: { contains: 'call', mode: 'insensitive' } },
+            { title: { contains: 'meeting' } },
+            { relatedTo: { contains: 'meeting' } },
+            { title: { contains: 'call' } },
           ],
         },
       }),
@@ -248,7 +248,7 @@ aiRouter.get('/agent/dashboard-summary', async (req: AuthRequest, res) => {
           max_tokens: 380,
         })
         aiNarrative = completion.choices[0]?.message?.content || ''
-      } catch (err) {
+      } catch (err: any) {
         console.error('[AI GROQ COMPLETION ERROR]:', err?.message || err)
         aiNarrative = generateLocalNarrative()
       }

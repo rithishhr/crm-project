@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: gcc360-api
+    runtime: node
+    rootDir: gcc360-api
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    plan: free
+    autoDeploy: true
