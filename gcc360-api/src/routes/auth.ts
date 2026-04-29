@@ -262,6 +262,8 @@ authRouter.post('/face-login', async (req: Request, res: Response) => {
     let matchedUser: any = null
     let bestDistance = 0.6 // threshold
 
+    console.log(`Checking face login against ${records.length} records...`)
+
     for (const record of records) {
       const stored = record.faceDescriptor as number[]
       if (Array.isArray(stored) && stored.length === descriptor.length) {
@@ -270,14 +272,19 @@ authRouter.post('/face-login', async (req: Request, res: Response) => {
           sum += Math.pow(stored[i] - descriptor[i], 2)
         }
         const distance = Math.sqrt(sum)
+        console.log(`- Match distance for user ${record.user.email}: ${distance.toFixed(4)}`)
+        
         if (distance < bestDistance) {
           bestDistance = distance
           matchedUser = record.user
         }
+      } else {
+        console.log(`- Record ${record.id} length mismatch or not an array. Stored length: ${Array.isArray(stored) ? stored.length : 'not array'}, descriptor length: ${descriptor.length}`)
       }
     }
 
     if (!matchedUser) {
+      console.log('Face login: No match found below threshold 0.6')
       res.status(401).json({ error: 'Face not recognized.' })
       return
     }
