@@ -40,8 +40,10 @@ const app = express()
 
 // ── Security ───────────────────────────────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
+const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').trim().replace(/\/$/, '')
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [frontendUrl, 'http://localhost:5173'],
   credentials: true,
 }))
 app.use(express.json({ limit: '10mb' }))
@@ -84,8 +86,12 @@ app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
     time: new Date().toISOString(),
-    version: '1.0.0',
+    version: '1.0.1',
     aiConfigured: !!process.env.GROQ_API_KEY,
+    configs: {
+      frontendUrl: (process.env.FRONTEND_URL || 'not set').slice(0, 15) + '...',
+      nodeEnv: process.env.NODE_ENV
+    }
   })
 })
 
