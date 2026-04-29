@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 import { notifyManagers } from '../lib/notifications'
@@ -7,7 +7,7 @@ import { syncClientToContact } from '../lib/leadSync'
 export const clientsRouter = Router()
 clientsRouter.use(authenticate)
 
-clientsRouter.get('/', async (req: AuthRequest, res) => {
+clientsRouter.get('/', async (req: AuthRequest, res: Response) => {
   const clients = await prisma.client.findMany({
     where:   { companyId: req.user!.companyId },
     orderBy: { totalRevenue: 'desc' },
@@ -15,7 +15,7 @@ clientsRouter.get('/', async (req: AuthRequest, res) => {
   res.json(clients)
 })
 
-clientsRouter.post('/', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+clientsRouter.post('/', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   const { name, accountType, industry, country, city, website,
           contactPerson, contactTitle, email, phone,
           accountOwner, customerStatus, paymentTerms, currency,
@@ -46,7 +46,7 @@ clientsRouter.post('/', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest
   res.status(201).json({ ...client, sync })
 })
 
-clientsRouter.patch('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+clientsRouter.patch('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   const fields = ['name', 'accountType', 'industry', 'country', 'city', 'website',
     'contactPerson', 'contactTitle', 'email', 'phone', 'accountOwner',
     'customerStatus', 'paymentTerms', 'currency', 'tier', 'address1',
@@ -63,13 +63,13 @@ clientsRouter.patch('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthReq
   res.json({ ...client, sync })
 })
 
-clientsRouter.delete('/:id', requireRole('ADMIN'), async (req: AuthRequest, res) => {
+clientsRouter.delete('/:id', requireRole('ADMIN'), async (req: AuthRequest, res: Response) => {
   await prisma.client.delete({ where: { id: req.params.id } })
   res.json({ success: true })
 })
 
 // ── DELETE /api/clients/bulk ─────────────────────────────────────────────
-clientsRouter.delete('/bulk', requireRole('ADMIN'), async (req: AuthRequest, res) => {
+clientsRouter.delete('/bulk', requireRole('ADMIN'), async (req: AuthRequest, res: Response) => {
   const { ids } = req.body
   if (!ids || !Array.isArray(ids)) {
     res.status(400).json({ error: 'IDs array is required.' })

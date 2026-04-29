@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 import Groq from 'groq-sdk'
@@ -17,7 +17,7 @@ function getGroq() {
   return _groq
 }
 
-opportunitiesRouter.get('/', async (req: AuthRequest, res) => {
+opportunitiesRouter.get('/', async (req: AuthRequest, res: Response) => {
   const opps = await prisma.opportunity.findMany({
     where: { 
       companyId: req.user!.companyId,
@@ -29,7 +29,7 @@ opportunitiesRouter.get('/', async (req: AuthRequest, res) => {
   res.json(opps)
 })
 
-opportunitiesRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res) => {
+opportunitiesRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res: Response) => {
   const { title, company, value, stage, probability, riskLevel, closeDate, notes } = req.body
   if (!title || !company || !closeDate) {
     res.status(400).json({ error: 'Title, company, and close date are required.' })
@@ -53,7 +53,7 @@ opportunitiesRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (r
   generateAutoTask('OPPORTUNITY', opp, req.user!.companyId, req.user!.userId).catch(console.error)
 })
 
-opportunitiesRouter.patch('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res) => {
+opportunitiesRouter.patch('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res: Response) => {
   const data: Record<string, unknown> = {}
   const fields = ['title', 'company', 'stage', 'probability', 'riskLevel', 'notes', 'ownerId']
   for (const f of fields) { if (req.body[f] !== undefined) data[f] = req.body[f] }
@@ -65,13 +65,13 @@ opportunitiesRouter.patch('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), asyn
   res.json(opp)
 })
 
-opportunitiesRouter.delete('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+opportunitiesRouter.delete('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   await prisma.opportunity.delete({ where: { id: req.params.id } })
   res.json({ success: true })
 })
 
 // ── DELETE /api/opportunities/bulk ─────────────────────────────────────────────
-opportunitiesRouter.delete('/bulk', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+opportunitiesRouter.delete('/bulk', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   const { ids } = req.body
   if (!ids || !Array.isArray(ids)) {
     res.status(400).json({ error: 'IDs array is required.' })
@@ -84,7 +84,7 @@ opportunitiesRouter.delete('/bulk', requireRole('ADMIN', 'MANAGER'), async (req:
 })
 
 // Generate AI quote for an opportunity
-opportunitiesRouter.post('/:id/generate-quote', async (req: AuthRequest, res) => {
+opportunitiesRouter.post('/:id/generate-quote', async (req: AuthRequest, res: Response) => {
   try {
     const opp = await prisma.opportunity.findFirst({ 
       where: { id: req.params.id, companyId: req.user!.companyId } 
@@ -165,7 +165,7 @@ Return ONLY valid JSON in this exact format:
 })
 
 // Mark Opportunity as WON (Creates a Deal)
-opportunitiesRouter.post('/:id/won', async (req: AuthRequest, res) => {
+opportunitiesRouter.post('/:id/won', async (req: AuthRequest, res: Response) => {
   try {
     const opp = await prisma.opportunity.findFirst({
       where: { id: req.params.id, companyId: req.user!.companyId }
@@ -235,7 +235,7 @@ opportunitiesRouter.post('/:id/won', async (req: AuthRequest, res) => {
 })
 
 // Mark Opportunity as LOST
-opportunitiesRouter.post('/:id/lost', async (req: AuthRequest, res) => {
+opportunitiesRouter.post('/:id/lost', async (req: AuthRequest, res: Response) => {
   try {
     const opp = await prisma.opportunity.findFirst({
       where: { id: req.params.id, companyId: req.user!.companyId }

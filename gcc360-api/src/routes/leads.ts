@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 import { notifyManagers, createNotification } from '../lib/notifications'
@@ -27,7 +27,7 @@ leadsRouter.get('/:id', async (req: AuthRequest, res: Response) => {
 })
 
 // ── POST /api/leads ────────────────────────────────────────────────────────────
-leadsRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res) => {
+leadsRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res: Response) => {
   const {
     title, company, contactName, email, phone, country, source,
     industry, value, priority, expectedTimeline,
