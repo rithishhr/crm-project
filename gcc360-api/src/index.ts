@@ -89,11 +89,20 @@ app.get('/', (_req, res) => {
   res.send('<h1>GCC360 Backend API is Running</h1><p>Visit <a href="/api/health">/api/health</a> for server status.</p>')
 })
 
-app.get('/api/health', (_req, res) => {
+app.get('/api/health', async (_req, res) => {
+  let dbStatus = 'testing...'
+  try {
+    await prisma.user.count()
+    dbStatus = 'connected'
+  } catch (err: any) {
+    dbStatus = 'failed: ' + (err.message || 'unknown error')
+  }
+
   res.json({
     status: 'ok',
     time: new Date().toISOString(),
-    version: '1.0.1',
+    version: '1.0.2',
+    database: dbStatus,
     aiConfigured: !!process.env.GROQ_API_KEY,
     configs: {
       frontendUrl: (process.env.FRONTEND_URL || 'not set').slice(0, 15) + '...',
