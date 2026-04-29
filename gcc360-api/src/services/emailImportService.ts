@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import Imap from "node-imap";
 import { simpleParser } from "mailparser";
 import * as Groq from "groq-sdk";
-import * as nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 import { syncLeadToClientAndContact } from "../lib/leadSync";
 
 const prisma = new PrismaClient();
@@ -102,38 +102,49 @@ export class EmailImportService {
               const f = imap.fetch(results, { bodies: "" });
 
               f.on("message", (msg: any) => {
-                simpleParser(msg as any, async (err, parsed) => {
-                  if (err) {
-                    console.error("Parse error:", err);
-                    return;
-                  }
+                const p = new Promise<void>((msgResolve) => {
+                  let buffer = "";
+                  msg.on("body", (stream: any) => {
+                    stream.on("data", (chunk: Buffer | string) => {
+                      buffer += chunk.toString("utf8");
+                    });
+                    stream.on("end", async () => {
+                      try {
+                        const parsed = await simpleParser(buffer);
+                        const from = addressToText(parsed.from) || "unknown";
+                        const to = addressToText(parsed.to);
+                        const subject = parsed.subject || "[No Subject]";
+                        const text = parsed.text || "";
+                        const html = parsed.html || undefined;
 
-                  const from = addressToText(parsed.from) || "unknown";
-                  const to = addressToText(parsed.to);
-                  const subject = parsed.subject || "[No Subject]";
-                  const text = parsed.text || "";
-                  const html = parsed.html || undefined;
+                        // Extract message ID from headers
+                        const messageId = (parsed.messageId || `${Date.now()}@email`).replace(
+                          /[<>]/g,
+                          ""
+                        );
 
-                  // Extract message ID from headers
-                  const messageId = (parsed.messageId || `${Date.now()}@email`).replace(
-                    /[<>]/g,
-                    ""
-                  );
+                        emails.push({
+                          from,
+                          to,
+                          subject,
+                          text: text.substring(0, 5000), // Limit text length
+                          html,
+                          messageId,
+                        });
 
-                  emails.push({
-                    from,
-                    to,
-                    subject,
-                    text: text.substring(0, 5000), // Limit text length
-                    html,
-                    messageId,
+                        count++;
+                        if (count >= maxEmails) {
+                          imap.end();
+                        }
+                      } catch (err) {
+                        console.error("Parse error:", err);
+                      }
+                      msgResolve();
+                    });
                   });
-
-                  count++;
-                  if (count >= maxEmails) {
-                    imap.end();
-                  }
                 });
+
+                void p;
               });
 
               f.on("error", (err: Error) => {

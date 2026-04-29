@@ -37,7 +37,7 @@ function scanInbox(): Promise<void> {
     })
 
     imap.once('ready', () => {
-      imap.openBox('INBOX', false, (_err, box) => {
+      imap.openBox('INBOX', false, (_err: Error | null, box: any) => {
         if (_err || box.messages.total === 0) {
           imap.end()
           resolve()
@@ -48,7 +48,7 @@ function scanInbox(): Promise<void> {
         const since = new Date()
         since.setDate(since.getDate() - 7)
 
-        imap.search(['UNSEEN', ['SINCE', since]], async (searchErr, uids) => {
+        imap.search(['UNSEEN', ['SINCE', since]], async (searchErr: Error | null, uids: number[]) => {
           if (searchErr || !uids || uids.length === 0) {
             imap.end()
             resolve()
@@ -60,11 +60,11 @@ function scanInbox(): Promise<void> {
           const fetch = imap.fetch(uids, { bodies: '', markSeen: true })
           const promises: Promise<void>[] = []
 
-          fetch.on('message', (msg) => {
+          fetch.on('message', (msg: any) => {
             const p = new Promise<void>((msgResolve) => {
               let buffer = ''
-              msg.on('body', (stream) => {
-                stream.on('data', (chunk) => { buffer += chunk.toString('utf8') })
+              msg.on('body', (stream: any) => {
+                stream.on('data', (chunk: Buffer | string) => { buffer += chunk.toString('utf8') })
                 stream.on('end', async () => {
                   try {
                     const parsed = await simpleParser(buffer)
