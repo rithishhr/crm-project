@@ -1,0 +1,12 @@
+Large files report
+Threshold: 1048576 bytes
+
+4.00 MB	gcc360-crm\dist\models\face_recognition_model-shard1
+4.00 MB	gcc360-crm\dist\models\ssd_mobilenetv1_model-shard1
+4.00 MB	gcc360-crm\public\models\face_recognition_model-shard1
+4.00 MB	gcc360-crm\public\models\ssd_mobilenetv1_model-shard1
+2.19 MB	gcc360-crm\dist\assets\index-Bj84x3MA.js
+2.15 MB	gcc360-crm\dist\models\face_recognition_model-shard2
+2.15 MB	gcc360-crm\public\models\face_recognition_model-shard2
+1.36 MB	gcc360-crm\dist\models\ssd_mobilenetv1_model-shard2
+1.36 MB	gcc360-crm\public\models\ssd_mobilenetv1_model-shard2
