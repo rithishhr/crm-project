@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -456,7 +456,7 @@ model EmailImportLog {
   toEmail        String   @db.VarChar(255)
   subject        String   @db.VarChar(500)
   bodyPreview    String?  @db.Text
-  fullBody       String?  @db.LongText
+  fullBody       String?  @db.Text
   attachments    Json?    // Array of {filename, url, mimetype}
   processedAt    DateTime?
   status         String   @default("PENDING") @db.VarChar(20) // PENDING, PROCESSED, FAILED, SKIPPED
@@ -566,7 +566,7 @@ model ChatConversation {
 model DocumentExtraction {
   id              String   @id @default(cuid())
   documentId      String   @unique
-  extractedText   String   @db.LongText
+  extractedText   String   @db.Text
   structuredData  Json?    // Parsed structured data from document
   documentType    String   @db.VarChar(50) // PROPOSAL, INVOICE, CONTRACT, RESUME, etc.
   confidence      Float    @default(0.8) // Extraction confidence
