@@ -8,7 +8,16 @@ import { syncLeadToClientAndContact } from '../lib/leadSync'
 export const leadsRouter = Router()
 leadsRouter.use(authenticate)
 
-leadsRouter.get('/:id', async (req: AuthRequest, res) => {
+leadsRouter.get('/', async (req: AuthRequest, res: Response) => {
+  const leads = await prisma.lead.findMany({
+    where:   { companyId: req.user!.companyId },
+    include: { assignedTo: { select: { id: true, name: true, avatar: true } } },
+    orderBy: { createdAt: 'desc' },
+  })
+  res.json(leads)
+})
+
+leadsRouter.get('/:id', async (req: AuthRequest, res: Response) => {
   const lead = await prisma.lead.findFirst({
     where:   { id: req.params.id, companyId: req.user!.companyId },
     include: { assignedTo: { select: { id: true, name: true } } },
