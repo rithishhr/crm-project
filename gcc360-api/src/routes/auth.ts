@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response, Request } from 'express'
 import bcrypt from 'bcryptjs'
 import { prisma } from '../lib/prisma'
 import { signAccessToken, signRefreshToken, verifyRefresh } from '../lib/jwt'
@@ -37,7 +37,7 @@ function isSameOrSimilarCompanyName(a: string, b: string) {
 }
 
 // ── GET /api/auth/bootstrap-status ───────────────────────────────────────────
-authRouter.get('/bootstrap-status', async (_req, res) => {
+authRouter.get('/bootstrap-status', async (_req: Request, res: Response) => {
   const [users, companies] = await Promise.all([
     prisma.user.count(),
     prisma.company.count(),
@@ -50,7 +50,7 @@ authRouter.get('/bootstrap-status', async (_req, res) => {
 })
 
 // ── GET /api/auth/company-check ──────────────────────────────────────────────
-authRouter.get('/company-check', async (req, res) => {
+authRouter.get('/company-check', async (req: Request, res: Response) => {
   const companyName = String(req.query.companyName || '').trim()
   if (!companyName) {
     res.status(400).json({ error: 'Company name is required.' })
@@ -67,7 +67,7 @@ authRouter.get('/company-check', async (req, res) => {
 })
 
 // ── POST /api/auth/login ───────────────────────────────────────────────────────
-authRouter.post('/login', async (req, res) => {
+authRouter.post('/login', async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body
     if (!email || !password) {
@@ -135,7 +135,7 @@ authRouter.post('/login', async (req, res) => {
 })
 
 // ── POST /api/auth/refresh ─────────────────────────────────────────────────────
-authRouter.post('/refresh', async (req, res) => {
+authRouter.post('/refresh', async (req: Request, res: Response) => {
   const token = req.cookies?.refreshToken
   if (!token) { res.status(401).json({ error: 'No session found.' }); return }
 
@@ -155,7 +155,7 @@ authRouter.post('/refresh', async (req, res) => {
 })
 
 // ── POST /api/auth/logout ──────────────────────────────────────────────────────
-authRouter.post('/logout', async (req, res) => {
+authRouter.post('/logout', async (req: Request, res: Response) => {
   const token = req.cookies?.refreshToken
   if (token) await prisma.refreshToken.deleteMany({ where: { token } }).catch(() => {})
   res.clearCookie('refreshToken')
@@ -164,7 +164,7 @@ authRouter.post('/logout', async (req, res) => {
 
 // ── POST /api/auth/signup ──────────────────────────────────────────────────────
 // Creates a brand new company + admin user (for new customers signing up)
-authRouter.post('/signup', async (req, res) => {
+authRouter.post('/signup', async (req: Request, res: Response) => {
   try {
     const { name, email, password, companyName, country, industry } = req.body
     if (!name || !email || !password || !companyName) {
@@ -236,7 +236,7 @@ authRouter.post('/signup', async (req, res) => {
 })
 
 // ── POST /api/auth/face-login ────────────────────────────────────────────────
-authRouter.post('/face-login', async (req, res) => {
+authRouter.post('/face-login', async (req: Request, res: Response) => {
   try {
     const { descriptor } = req.body
     if (!descriptor || !Array.isArray(descriptor)) {
@@ -322,7 +322,7 @@ authRouter.post('/face-login', async (req, res) => {
 })
 
 // ── POST /api/auth/change-password-first-login ──────────────────────────────
-authRouter.post('/change-password-first-login', async (req, res) => {
+authRouter.post('/change-password-first-login', async (req: Request, res: Response) => {
   try {
     const { email, tempPassword, newPassword } = req.body
     if (!email || !tempPassword || !newPassword) {

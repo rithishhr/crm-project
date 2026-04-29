@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
@@ -8,7 +8,7 @@ export const usersRouter = Router()
 usersRouter.use(authenticate)
 
 // ── GET /api/users ─────────────────────────────────────────────────────────────
-usersRouter.get('/', async (req: AuthRequest, res) => {
+usersRouter.get('/', async (req: AuthRequest, res: Response) => {
   const users = await prisma.user.findMany({
     where:   { companyId: req.user!.companyId },
     select:  { id: true, name: true, email: true, role: true, department: true, avatar: true, avatarUrl: true, phone: true, status: true, lastLogin: true, createdAt: true },
@@ -18,7 +18,7 @@ usersRouter.get('/', async (req: AuthRequest, res) => {
 })
 
 // ── POST /api/users/invite ─────────────────────────────────────────────────────
-usersRouter.post('/invite', requireRole('ADMIN'), async (req: AuthRequest, res) => {
+usersRouter.post('/invite', requireRole('ADMIN'), async (req: AuthRequest, res: Response) => {
   const { name, email, role, department } = req.body
   const allowedRoles = ['ADMIN', 'MANAGER', 'SALES', 'FINANCE']
   if (!name || !email || !role) {
@@ -65,7 +65,7 @@ usersRouter.post('/invite', requireRole('ADMIN'), async (req: AuthRequest, res) 
 })
 
 // ── PATCH /api/users/:id/role ──────────────────────────────────────────────────
-usersRouter.patch('/:id/role', requireRole('ADMIN'), async (req: AuthRequest, res) => {
+usersRouter.patch('/:id/role', requireRole('ADMIN'), async (req: AuthRequest, res: Response) => {
   const { role } = req.body
   if (!role) { res.status(400).json({ error: 'Role is required.' }); return }
 
@@ -77,7 +77,7 @@ usersRouter.patch('/:id/role', requireRole('ADMIN'), async (req: AuthRequest, re
 })
 
 // ── PATCH /api/users/:id/status ────────────────────────────────────────────────
-usersRouter.patch('/:id/status', requireRole('ADMIN'), async (req: AuthRequest, res) => {
+usersRouter.patch('/:id/status', requireRole('ADMIN'), async (req: AuthRequest, res: Response) => {
   const { status } = req.body
   if (!['ACTIVE', 'INACTIVE'].includes(status)) {
     res.status(400).json({ error: 'Status must be ACTIVE or INACTIVE.' })
@@ -91,7 +91,7 @@ usersRouter.patch('/:id/status', requireRole('ADMIN'), async (req: AuthRequest, 
 })
 
 // ── DELETE /api/users/:id ──────────────────────────────────────────────────────
-usersRouter.delete('/:id', requireRole('ADMIN'), async (req: AuthRequest, res) => {
+usersRouter.delete('/:id', requireRole('ADMIN'), async (req: AuthRequest, res: Response) => {
   // Prevent deleting yourself
   if (req.params.id === req.user!.userId) {
     res.status(400).json({ error: 'You cannot delete your own account.' })
@@ -102,7 +102,7 @@ usersRouter.delete('/:id', requireRole('ADMIN'), async (req: AuthRequest, res) =
 })
 
 // ── POST /api/users/:id/reset-password ─────────────────────────────────────────
-usersRouter.post('/:id/reset-password', requireRole('ADMIN'), async (req: AuthRequest, res) => {
+usersRouter.post('/:id/reset-password', requireRole('ADMIN'), async (req: AuthRequest, res: Response) => {
   const user = await prisma.user.findUnique({ where: { id: req.params.id } })
   if (!user) { res.status(404).json({ error: 'User not found.' }); return }
 

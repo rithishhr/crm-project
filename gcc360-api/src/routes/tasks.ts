@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth'
 import { prisma } from '../lib/prisma'
 import { createNotification } from '../lib/notifications'
@@ -6,7 +6,7 @@ import { createNotification } from '../lib/notifications'
 export const tasksRouter = Router()
 tasksRouter.use(authenticate)
 
-tasksRouter.get('/', async (req: AuthRequest, res) => {
+tasksRouter.get('/', async (req: AuthRequest, res: Response) => {
   const { companyId, role, userId } = req.user!
   const tasks = await prisma.task.findMany({
     where: {
@@ -19,7 +19,7 @@ tasksRouter.get('/', async (req: AuthRequest, res) => {
   res.json(tasks)
 })
 
-tasksRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res) => {
+tasksRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res: Response) => {
   const { title, dueDate, priority, relatedTo, notes, assignedToId } = req.body
   if (!title || !dueDate) { res.status(400).json({ error: 'Title and due date are required.' }); return }
 
@@ -51,7 +51,7 @@ tasksRouter.post('/', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: Auth
   res.status(201).json(task)
 })
 
-tasksRouter.patch('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res) => {
+tasksRouter.patch('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res: Response) => {
   const fields = ['title', 'status', 'priority', 'relatedTo', 'assignedToId', 'notes']
   const data: Record<string, unknown> = {}
   for (const f of fields) { if (req.body[f] !== undefined) data[f] = req.body[f] }
@@ -63,13 +63,13 @@ tasksRouter.patch('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: 
   res.json(task)
 })
 
-tasksRouter.delete('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res) => {
+tasksRouter.delete('/:id', requireRole('ADMIN', 'MANAGER', 'SALES'), async (req: AuthRequest, res: Response) => {
   await prisma.task.delete({ where: { id: req.params.id } })
   res.json({ success: true })
 })
 
 // ── DELETE /api/tasks/bulk ───────────────────────────────────────────────
-tasksRouter.delete('/bulk', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
+tasksRouter.delete('/bulk', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res: Response) => {
   const { ids } = req.body
   if (!ids || !Array.isArray(ids)) {
     res.status(400).json({ error: 'IDs array is required.' })
