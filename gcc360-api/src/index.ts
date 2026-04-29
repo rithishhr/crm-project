@@ -43,7 +43,14 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').trim().replace(/\/$/, '')
 
 app.use(cors({
-  origin: [frontendUrl, 'http://localhost:5173'],
+  origin: (origin, callback) => {
+    // Allow if no origin (like mobile apps or curl) or if it matches our URL/localhost
+    if (!origin || origin === frontendUrl || origin.includes('localhost') || origin.endsWith('.vercel.app')) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true,
 }))
 app.use(express.json({ limit: '10mb' }))
