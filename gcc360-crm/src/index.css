@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── DARK THEME (default) ─────────────────────────────────────────────── */
+:root, .dark {
+  --bg-base:        #0a0f1e;
+  --bg-surface:     #0f1729;
+  --bg-card:        #111d33;
+  --bg-elevated:    #162040;
+  --bg-hover:       #1c2a4e;
+  --border:         #1e3055;
+  --border-subtle:  rgba(30,48,85,0.5);
+
+  --text-primary:   #f0f6ff;
+  --text-secondary: #a8c0e8;
+  --text-muted:     #5a7aaa;
+  --text-placeholder: #2e4872;
+
+  --accent:         #14b8a6;
+  --accent-hover:   #2dd4bf;
+  --accent-muted:   rgba(20,184,166,0.12);
+  --accent-border:  rgba(20,184,166,0.25);
+
+  --role-admin:     #f59e0b;
+  --role-sales-mgr: #14b8a6;
+  --role-sales:     #3b82f6;
+  --role-finance:   #10b981;
+  --role-analyst:   #a78bfa;
+
+  --shadow-card:    0 2px 8px rgba(0,0,0,0.6);
+  --shadow-hover:   0 6px 24px rgba(0,0,0,0.7);
+  --input-bg:       #0f1b32;
+}
+
+/* ── LIGHT THEME ──────────────────────────────────────────────────────── */
+.light {
+  --bg-base:        #eef2ff;
+  --bg-surface:     #ffffff;
+  --bg-card:        #ffffff;
+  --bg-elevated:    #f3f6ff;
+  --bg-hover:       #e8eeff;
+  --border:         #c7d2f0;
+  --border-subtle:  rgba(180,200,240,0.6);
+
+  --text-primary:   #020617;
+  --text-secondary: #0f172a;
+  --text-muted:     #334155;
+  --text-placeholder: #64748b;
+
+  --accent:         #0d9488;
+  --accent-hover:   #0f766e;
+  --accent-muted:   rgba(13,148,136,0.1);
+  --accent-border:  rgba(13,148,136,0.3);
+
+  --role-admin:     #d97706;
+  --role-sales-mgr: #0d9488;
+  --role-sales:     #2563eb;
+  --role-finance:   #059669;
+  --role-analyst:   #7c3aed;
+
+  --shadow-card:    0 2px 8px rgba(60,90,180,0.08);
+  --shadow-hover:   0 6px 20px rgba(60,90,180,0.15);
+  --input-bg:       #f3f6ff;
+}
+
+/* ── BASE ──────────────────────────────────────────────────────────────── */
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  margin: 0; padding: 0;
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[dir="rtl"] body {
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-surface); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+@layer components {
+  /* Panel */
+  .panel {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-card);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .panel:hover { border-color: var(--accent-border); box-shadow: var(--shadow-hover); }
+
+  /* KPI card */
+  .kpi-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .kpi-card:hover { border-color: var(--accent-border); box-shadow: var(--shadow-hover); }
+
+  /* Sidebar item */
+  .sidebar-item {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.575rem 0.625rem; border-radius: 0.5rem;
+    cursor: pointer; transition: all 0.15s ease;
+    color: var(--text-muted); border: 1px solid transparent;
+    width: 100%; text-align: start; background: transparent;
+    font-family: inherit; font-size: 0.875rem;
+  }
+  .sidebar-item:hover { color: var(--text-primary); background-color: var(--bg-hover); border-color: var(--border); }
+  .sidebar-item.active { color: var(--accent); background-color: var(--accent-muted); border-color: var(--accent-border); font-weight: 600; }
+
+  /* Table */
+  .data-table th {
+    font-size: 0.7rem; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 0.75rem 1rem; text-align: start;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--bg-elevated); white-space: nowrap;
+  }
+  .data-table td {
+    padding: 0.875rem 1rem; font-size: 0.875rem;
+    color: var(--text-secondary); border-bottom: 1px solid var(--border-subtle);
+    transition: background-color 0.12s;
+  }
+  .data-table tr:hover td { background-color: var(--bg-hover); }
+  .data-table tr:last-child td { border-bottom: none; }
+
+  /* Badge */
+  .badge { display: inline-flex; align-items: center; padding: 0.2rem 0.6rem; border-radius: 0.4rem; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.02em; }
+
+  /* Buttons */
+  .btn-primary {
+    background-color: var(--accent); color: #fff; font-weight: 600;
+    padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem;
+    transition: all 0.2s ease; display: inline-flex; align-items: center;
+    gap: 0.5rem; border: none; cursor: pointer; white-space: nowrap; font-family: inherit;
+  }
+  .btn-primary:hover { background-color: var(--accent-hover); box-shadow: 0 0 20px rgba(20,184,166,0.35); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-secondary {
+    background-color: var(--bg-elevated); color: var(--text-secondary); font-weight: 500;
+    padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem;
+    transition: all 0.2s ease; display: inline-flex; align-items: center;
+    gap: 0.5rem; border: 1px solid var(--border); cursor: pointer; font-family: inherit;
+  }
+  .btn-secondary:hover { background-color: var(--bg-hover); color: var(--text-primary); border-color: var(--accent-border); }
+
+  /* Input */
+  .input-field {
+    background-color: var(--input-bg); border: 1px solid var(--border);
+    border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem;
+    color: var(--text-primary); width: 100%; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
+  }
+  .input-field::placeholder { color: var(--text-placeholder); }
+  .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+}

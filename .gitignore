@@ -1,0 +1,15 @@
+node_modules/
+.env
+.DS_Store
+.env.local
+.env.*
+/.vscode/
+**/dist
+**/build
+**/public/models
+**/uploads
+*.log
+cleanup-report.txt
+/.idea
+/.cache
+/.turbo

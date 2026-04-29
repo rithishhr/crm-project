@@ -1,0 +1,639 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(255)
+  industry  String   @db.VarChar(100)
+  country   String   @db.VarChar(100)
+  plan      String   @default("STARTER") @db.VarChar(20)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users                 User[]
+  leads                 Lead[]
+  clients               Client[]
+  deals                 Deal[]
+  invoices              Invoice[]
+  opportunities         Opportunity[]
+  contacts              Contact[]
+  tasks                 Task[]
+  activities            Activity[]
+  notifications         Notification[]
+  integrationConfigs    IntegrationConfig[]
+  emailImportLogs       EmailImportLog[]
+  callLogs              CallLog[]
+  socialMediaLeads      SocialMediaLead[]
+  chatConversations     ChatConversation[]
+  reportTemplates       ReportTemplate[]
+  generatedReports      GeneratedReport[]
+
+  @@map("companies")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String    @db.VarChar(255)
+  email        String    @unique @db.VarChar(255)
+  passwordHash String    @db.VarChar(255)
+  role         String    @default("SALESPERSON") @db.VarChar(30)
+  department   String?   @db.VarChar(100)
+  avatar       String?   @db.VarChar(10)
+  avatarUrl    String?   @db.VarChar(500)
+  phone        String?   @db.VarChar(50)
+  bio          String?   @db.Text
+  status       String    @default("ACTIVE") @db.VarChar(20)
+  companyId    String
+  faceDescriptor Json?
+  biometricEnabled Boolean @default(false)
+  lastLogin    DateTime?
+  isFirstLogin Boolean @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  company              Company              @relation(fields: [companyId], references: [id])
+  assignedLeads        Lead[]               @relation("AssignedLeads")
+  tasks                Task[]
+  activities           Activity[]
+  opportunities        Opportunity[]
+  refreshTokens        RefreshToken[]
+  notifications        Notification[]
+  documents            Document[]
+  auditLogs            AuditLog[]
+  biometricRecords     BiometricRecord[]
+  callLogs             CallLog[]
+
+  @@index([companyId])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique @db.VarChar(600)
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Lead {
+  id                 String   @id @default(cuid())
+  // Basic Info
+  title              String?  @db.VarChar(255)
+  company            String   @db.VarChar(255)
+  contactName        String   @db.VarChar(255)
+  email              String   @db.VarChar(255)
+  phone              String?  @db.VarChar(50)
+  country            String?  @db.VarChar(100)
+  source             String?  @db.VarChar(100)
+  // Qualification
+  industry           String?  @db.VarChar(100)
+  value              Decimal  @default(0) @db.Decimal(15, 2)
+  priority           String   @default("MEDIUM") @db.VarChar(20)
+  expectedTimeline   String?  @db.VarChar(100)
+  // Status & AI
+  status             String   @default("NEW") @db.VarChar(20)
+  aiCredibilityScore Int      @default(0)
+  aiVerified         Boolean  @default(false)
+  aiFraudFlag        Boolean  @default(false)
+  aiNotes            String?  @db.Text
+  // Notes
+  requirements       String?  @db.Text
+  internalNotes      String?  @db.Text
+  tags               String?  @db.VarChar(500)
+  // Email scan fields
+  emailSubject       String?  @db.VarChar(500)
+  emailBody          String?  @db.Text
+  fromEmail          Boolean  @default(false)
+  // Relations
+  companyId          String
+  assignedToId       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  companyRef      Company         @relation(fields: [companyId], references: [id])
+  assignedTo      User?           @relation("AssignedLeads", fields: [assignedToId], references: [id])
+  opportunity     Opportunity?
+  documents       Document[]
+  emailImportLogs EmailImportLog[]
+  callLogs        CallLog[]
+
+  @@index([companyId])
+  @@index([assignedToId])
+  @@map("leads")
+}
+
+model Opportunity {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  company     String   @db.VarChar(255)
+  value       Decimal  @default(0) @db.Decimal(15, 2)
+  stage       String   @default("QUALIFICATION") @db.VarChar(30)
+  probability Int      @default(0)
+  riskLevel   String   @default("LOW") @db.VarChar(20)
+  closeDate   DateTime
+  notes       String?  @db.Text
+  companyId   String
+  ownerId     String
+  leadId      String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  companyRef Company   @relation(fields: [companyId], references: [id])
+  owner      User      @relation(fields: [ownerId], references: [id])
+  lead       Lead?     @relation(fields: [leadId], references: [id])
+  aiQuotes   AIQuote[]
+
+  @@index([companyId])
+  @@index([ownerId])
+  @@map("opportunities")
+}
+
+model Client {
+  id              String   @id @default(cuid())
+  // Company Profile
+  name            String   @db.VarChar(255)
+  accountType     String   @default("CUSTOMER") @db.VarChar(30)
+  industry        String?  @db.VarChar(100)
+  country         String?  @db.VarChar(100)
+  city            String?  @db.VarChar(100)
+  website         String?  @db.VarChar(255)
+  // Primary Contact
+  contactPerson   String?  @db.VarChar(255)
+  contactTitle    String?  @db.VarChar(100)
+  email           String?  @db.VarChar(255)
+  phone           String?  @db.VarChar(50)
+  // Commercial
+  accountOwner    String?  @db.VarChar(255)
+  customerStatus  String   @default("PROSPECT") @db.VarChar(20)
+  paymentTerms    String?  @db.VarChar(50)
+  currency        String   @default("AED") @db.VarChar(10)
+  tier            String   @default("SILVER") @db.VarChar(20)
+  totalRevenue    Decimal  @default(0) @db.Decimal(15, 2)
+  activeDeals     Int      @default(0)
+  // Address
+  address1        String?  @db.VarChar(255)
+  postalCode      String?  @db.VarChar(20)
+  // Notes
+  notes           String?  @db.Text
+  tags            String?  @db.VarChar(500)
+  companyId       String
+  since           DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company  Company   @relation(fields: [companyId], references: [id])
+  invoices Invoice[]
+  deals    Deal[]
+  contacts Contact[]
+
+  @@index([companyId])
+  @@map("clients")
+}
+
+model Contact {
+  id           String    @id @default(cuid())
+  // Basic Info
+  firstName    String    @db.VarChar(100)
+  lastName     String    @db.VarChar(100)
+  clientId     String?
+  jobTitle     String?   @db.VarChar(100)
+  department   String?   @db.VarChar(100)
+  // Communication
+  email        String    @db.VarChar(255)
+  phone        String?   @db.VarChar(50)
+  mobile       String?   @db.VarChar(50)
+  // Status
+  ownerId      String?   @db.VarChar(255)
+  status       String    @default("ACTIVE") @db.VarChar(20)
+  // Legacy / display
+  company      String    @db.VarChar(255)
+  linkedOpportunities Int @default(0)
+  lastActivity DateTime?
+  notes        String?   @db.Text
+  tags         String?   @db.VarChar(500)
+  companyId    String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  companyRef  Company @relation(fields: [companyId], references: [id])
+  clientRef   Client? @relation(fields: [clientId], references: [id])
+
+  @@index([companyId])
+  @@map("contacts")
+}
+
+model Deal {
+  id            String   @id @default(cuid())
+  title         String   @db.VarChar(255)
+  company       String   @db.VarChar(255)
+  value         Decimal  @db.Decimal(15, 2)
+  stage         String   @db.VarChar(30)
+  closedDate    DateTime
+  opportunityId String?
+  clientId      String?
+  companyId     String
+  ownerId       String
+  createdAt     DateTime @default(now())
+
+  companyRef Company  @relation(fields: [companyId], references: [id])
+  client     Client?  @relation(fields: [clientId], references: [id])
+  documents  Document[]
+  callLogs   CallLog[]
+
+  @@index([companyId])
+  @@map("deals")
+}
+
+model Task {
+  id           String   @id @default(cuid())
+  title        String   @db.VarChar(255)
+  dueDate      DateTime
+  priority     String   @default("MEDIUM") @db.VarChar(20)
+  status       String   @default("TODO") @db.VarChar(20)
+  description  String?  @db.Text
+  relatedTo    String?  @db.VarChar(255)
+  assignedToId String
+  companyId    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignedTo User    @relation(fields: [assignedToId], references: [id])
+  company    Company @relation(fields: [companyId], references: [id])
+
+  @@index([assignedToId])
+  @@index([companyId])
+  @@map("tasks")
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  type        String   @db.VarChar(20)
+  description String   @db.Text
+  contact     String?  @db.VarChar(255)
+  company     String?  @db.VarChar(255)
+  createdById String
+  companyId   String
+  createdAt   DateTime @default(now())
+
+  createdBy  User    @relation(fields: [createdById], references: [id])
+  companyRef Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+  @@map("activities")
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  invoiceNumber String   @unique @db.VarChar(50)
+  amount        Decimal  @db.Decimal(15, 2)
+  dueDate       DateTime
+  status        String   @default("PENDING") @db.VarChar(20)
+  items         String?  @db.Text
+  clientId      String
+  companyId     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  client     Client  @relation(fields: [clientId], references: [id])
+  companyRef Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+  @@index([clientId])
+  @@map("invoices")
+}
+
+model AIQuote {
+  id            String   @id @default(cuid())
+  type          String   @db.VarChar(20)
+  basePrice     Decimal  @db.Decimal(15, 2)
+  margin        Decimal  @db.Decimal(5, 2)
+  vat           Decimal  @db.Decimal(15, 2)
+  total         Decimal  @db.Decimal(15, 2)
+  confidence    Int
+  justification String   @db.Text
+  opportunityId String
+  createdAt     DateTime @default(now())
+
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([opportunityId])
+  @@map("ai_quotes")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   @db.VarChar(50)
+  title     String   @db.VarChar(255)
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  link      String?  @db.VarChar(255)
+  userId    String
+  companyId String
+  createdAt DateTime @default(now())
+
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyRef Company @relation(fields: [companyId], references: [id])
+
+  @@index([userId])
+  @@index([companyId])
+  @@map("notifications")
+}
+
+model EmailScanLog {
+  id          String   @id @default(cuid())
+  messageId   String   @unique @db.VarChar(255)
+  fromAddress String   @db.VarChar(255)
+  subject     String   @db.VarChar(500)
+  scannedAt   DateTime @default(now())
+  result      String   @db.VarChar(20)
+  leadId      String?
+  companyId   String
+
+  @@index([companyId])
+  @@map("email_scan_logs")
+}
+
+model Document {
+  id           String   @id @default(cuid())
+  fileName     String   @db.VarChar(255)
+  fileUrl      String   @db.VarChar(500)
+  documentType String?  @db.VarChar(50)
+  leadId       String?
+  dealId       String?
+  userId       String
+  createdAt    DateTime @default(now())
+
+  lead               Lead?                  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  deal               Deal?                  @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentExtraction DocumentExtraction?
+
+  @@index([leadId])
+  @@index([dealId])
+  @@index([userId])
+  @@map("documents")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   @db.VarChar(255)
+  entityType String?  @db.VarChar(50)
+  entityId   String?  @db.VarChar(36)
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("audit_logs")
+}
+
+// ==================== BIOMETRIC & SECURITY ====================
+
+model BiometricRecord {
+  id                String   @id @default(cuid())
+  userId            String
+  faceDescriptor    Json     // 128D array from face-api.js
+  confidenceScore   Float    // 0-1 confidence level
+  enrollmentDate    DateTime
+  lastUsed          DateTime?
+  successCount      Int      @default(0)
+  failureCount      Int      @default(0)
+  status            String   @default("ACTIVE") @db.VarChar(20) // ACTIVE, INACTIVE, COMPROMISED
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("biometric_records")
+}
+
+// ==================== INTEGRATIONS CONFIG ====================
+
+model IntegrationConfig {
+  id           String   @id @default(cuid())
+  companyId    String
+  integrationType String @db.VarChar(50) // EMAIL, VOICE, SOCIAL, AI
+  provider     String   @db.VarChar(100) // GMAIL, IMAP, VAPI, TWILIO, FACEBOOK, INSTAGRAM
+  apiKey       String   @db.VarChar(500) // Encrypted
+  apiSecret    String?  @db.VarChar(500) // Encrypted
+  webhookUrl   String?  @db.VarChar(500)
+  webhookSecret String? @db.VarChar(500) // For signature verification
+  config       Json?    // Provider-specific config
+  isActive     Boolean  @default(true)
+  lastSyncAt   DateTime?
+  errorLog     String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  companyRef Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, integrationType, provider])
+  @@index([companyId])
+  @@map("integration_configs")
+}
+
+// ==================== EMAIL IMPORTS ====================
+
+model EmailImportLog {
+  id             String   @id @default(cuid())
+  companyId      String
+  messageId      String   @db.VarChar(500)
+  fromEmail      String   @db.VarChar(255)
+  toEmail        String   @db.VarChar(255)
+  subject        String   @db.VarChar(500)
+  bodyPreview    String?  @db.Text
+  fullBody       String?  @db.LongText
+  attachments    Json?    // Array of {filename, url, mimetype}
+  processedAt    DateTime?
+  status         String   @default("PENDING") @db.VarChar(20) // PENDING, PROCESSED, FAILED, SKIPPED
+  leadCreated    Boolean  @default(false)
+  leadId         String?
+  extractedData  Json?    // Parsed data for lead creation
+  errorMessage   String?  @db.Text
+  createdAt      DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lead    Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([messageId])
+  @@index([status])
+  @@map("email_import_logs")
+}
+
+// ==================== VOICE & CALL TRACKING ====================
+
+model CallLog {
+  id            String   @id @default(cuid())
+  companyId     String
+  userId        String
+  leadId        String?
+  dealId        String?
+  externalCallId String? @db.VarChar(255) // From Vapi/Twilio
+  phoneNumber   String   @db.VarChar(50)
+  duration      Int      @default(0) // in seconds
+  status        String   @db.VarChar(20) // OUTGOING, INCOMING, MISSED, COMPLETED, FAILED
+  recordingUrl  String?  @db.VarChar(500)
+  transcript    String?  @db.Text // AI transcription
+  summary       String?  @db.Text // AI summary
+  sentiment     String?  @db.VarChar(20) // POSITIVE, NEUTRAL, NEGATIVE
+  actionItems   Json?    // Array of action items extracted from call
+  notes         String?  @db.Text
+  provider      String   @default("VAPI") @db.VarChar(20) // VAPI, TWILIO
+  createdAt     DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  lead    Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  deal    Deal?   @relation(fields: [dealId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([leadId])
+  @@index([dealId])
+  @@map("call_logs")
+}
+
+// ==================== SOCIAL MEDIA INTEGRATIONS ====================
+
+model SocialMediaLead {
+  id              String   @id @default(cuid())
+  companyId       String
+  platform        String   @db.VarChar(50) // FACEBOOK, INSTAGRAM, LINKEDIN, TIKTOK
+  externalLeadId  String   @db.VarChar(255) // From social platform
+  firstName       String?  @db.VarChar(100)
+  lastName        String?  @db.VarChar(100)
+  email           String?  @db.VarChar(255)
+  phone           String?  @db.VarChar(50)
+  company         String?  @db.VarChar(255)
+  message         String?  @db.Text // Initial message/inquiry
+  campaignId      String?  @db.VarChar(255) // Facebook/Instagram campaign
+  campaignName    String?  @db.VarChar(255)
+  leadFormId      String?  @db.VarChar(255) // Facebook Lead Ads form ID
+  createdLeadId   String?  // Reference to Lead model if converted
+  status          String   @default("PENDING") @db.VarChar(20) // PENDING, CONVERTED, REJECTED, DUPLICATE
+  syncedToLeads   Boolean  @default(false)
+  metadata        Json?    // Platform-specific data
+  receivedAt      DateTime
+  processedAt     DateTime?
+  createdAt       DateTime @default(now())
+
+  companyRef Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([platform, externalLeadId])
+  @@index([companyId])
+  @@index([status])
+  @@map("social_media_leads")
+}
+
+// ==================== AI ASSISTANT & DOCUMENTS ====================
+
+model ChatConversation {
+  id          String   @id @default(cuid())
+  companyId   String
+  userId      String?
+  leadId      String?
+  dealId      String?
+  title       String?  @db.VarChar(255)
+  context     String?  @db.Text // System prompt context
+  messages    Json     // Array of {role, content, timestamp}
+  status      String   @default("ACTIVE") @db.VarChar(20)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([leadId])
+  @@index([dealId])
+  @@map("chat_conversations")
+}
+
+model DocumentExtraction {
+  id              String   @id @default(cuid())
+  documentId      String   @unique
+  extractedText   String   @db.LongText
+  structuredData  Json?    // Parsed structured data from document
+  documentType    String   @db.VarChar(50) // PROPOSAL, INVOICE, CONTRACT, RESUME, etc.
+  confidence      Float    @default(0.8) // Extraction confidence
+  processedAt     DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@map("document_extractions")
+}
+
+// ==================== REPORTS & EXPORTS ====================
+
+model ReportTemplate {
+  id         String   @id @default(cuid())
+  companyId  String
+  name       String   @db.VarChar(255)
+  description String? @db.Text
+  type       String   @db.VarChar(50) // DEALS, FINANCE, PIPELINE, CUSTOMER, PERFORMANCE
+  sections   Json     // Array of {title, metric, calculation}
+  isDefault  Boolean  @default(false)
+  isPublic   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("report_templates")
+}
+
+model GeneratedReport {
+  id           String   @id @default(cuid())
+  companyId    String
+  templateId   String?
+  title        String   @db.VarChar(255)
+  reportType   String   @db.VarChar(50)
+  filePath     String   @db.VarChar(500)
+  fileUrl      String?  @db.VarChar(500) // Presigned URL
+  filters      Json?    // Applied filters
+  data         Json?    // Report data
+  generatedBy  String   @db.VarChar(255)
+  generatedAt  DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([generatedAt])
+  @@map("generated_reports")
+}
+
+// ==================== EXTEND EXISTING MODELS ====================
+
+// Add relations to Lead for integrations
+model LeadExtended {
+  leadId                String @id @db.VarChar(36)
+  importedFromEmail     Boolean @default(false)
+  importedFromSocial    Boolean @default(false)
+  importedFromCall      Boolean @default(false)
+  emailImportLogId      String?
+  socialMediaLeadId     String?
+  callLogId             String?
+  aiExtractionScore     Float   @default(0)
+  lastInteractionType   String? @db.VarChar(50)
+  lastInteractionDate   DateTime?
+  conversionFunnel      String? @db.VarChar(50) // EMAIL, CALL, SOCIAL, DIRECT
+  createdAt             DateTime @default(now())
+
+  @@map("lead_extended")
+}
