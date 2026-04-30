@@ -3,22 +3,56 @@ import nodemailer from 'nodemailer'
 export const transporter = nodemailer.createTransport({
   host:   process.env.MAIL_HOST  || 'smtp.gmail.com',
   port:   Number(process.env.MAIL_PORT) || 587,
-  secure: false, // true for 465, false for other ports (STARTTLS)
+  secure: false,
   pool:   true,
-  maxConnections: 3,
-  connectionTimeout: 20000, // 20 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 30000,
-  logger: true,
-  debug:  true,
   auth: {
     user: process.env.MAIL_USER || '',
     pass: process.env.MAIL_PASS || '',
   },
-  tls: {
-    rejectUnauthorized: false // Ignore self-signed certificate errors common in cloud relays
-  }
+  tls: { rejectUnauthorized: false }
 })
+
+/**
+ * Sends an email using either Resend API (if configured) or standard SMTP.
+ */
+export async function sendMail(options: { to: string; subject: string; html?: string; text?: string }) {
+  const { to, subject, html, text } = options;
+
+  // 1. Try Resend API first (Bypasses all Port Blocks)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: process.env.MAIL_FROM || 'GCC360 CRM <onboarding@resend.dev>',
+          to,
+          subject,
+          html: html || text,
+          text: text,
+        }),
+      });
+      
+      if (response.ok) return await response.json();
+      const error = await response.text();
+      console.warn('[RESEND API ERROR]:', error);
+    } catch (e: any) {
+      console.error('[RESEND FETCH FAILED]:', e.message);
+    }
+  }
+
+  // 2. Fallback to SMTP
+  return transporter.sendMail({
+    from: process.env.MAIL_FROM || process.env.MAIL_USER,
+    to,
+    subject,
+    html,
+    text,
+  });
+}
 
 export async function sendInviteEmail(
   to: string,
@@ -28,8 +62,7 @@ export async function sendInviteEmail(
 ): Promise<void> {
   if (!process.env.MAIL_USER) return // Email not configured, skip silently
 
-  await transporter.sendMail({
-    from:    process.env.MAIL_FROM || process.env.MAIL_USER,
+  await sendMail({
     to,
     subject: 'You have been invited to GCC360 CRM',
     html: `
@@ -56,8 +89,7 @@ export async function sendResetPasswordEmail(
 ): Promise<void> {
   if (!process.env.MAIL_USER) return
 
-  await transporter.sendMail({
-    from:    process.env.MAIL_FROM || process.env.MAIL_USER,
+  await sendMail({
     to,
     subject: 'Password Reset: GCC360 CRM',
     html: `
@@ -85,8 +117,7 @@ export async function sendLeadNotification(
 ): Promise<void> {
   if (!process.env.MAIL_USER) return
 
-  await transporter.sendMail({
-    from:    process.env.MAIL_FROM || process.env.MAIL_USER,
+  await sendMail({
     to,
     subject: `🔔 New Lead Detected: ${leadCompany}`,
     html: `
