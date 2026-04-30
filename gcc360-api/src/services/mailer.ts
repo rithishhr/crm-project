@@ -20,6 +20,7 @@ export async function sendMail(options: { to: string; subject: string; html?: st
 
   // 1. Try Resend API first (Bypasses all Port Blocks)
   if (process.env.RESEND_API_KEY) {
+    console.log(`[MAIL] Attempting API send to ${to} via Resend...`);
     try {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -45,6 +46,7 @@ export async function sendMail(options: { to: string; subject: string; html?: st
   }
 
   // 2. Fallback to SMTP
+  console.log(`[MAIL] Falling back to SMTP send to ${to}...`);
   return transporter.sendMail({
     from: process.env.MAIL_FROM || process.env.MAIL_USER,
     to,

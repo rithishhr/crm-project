@@ -7,6 +7,17 @@ import { sendMail } from '../services/mailer'
 export const emailRouter = Router()
 emailRouter.use(authenticate)
 
+// ── GET /api/email/config ────────────────────────────────────────────────────
+emailRouter.get('/config', requireRole('ADMIN'), async (_req, res) => {
+  res.json({
+    smtpConfigured: !!process.env.MAIL_USER,
+    resendConfigured: !!process.env.RESEND_API_KEY,
+    smtpHost: process.env.MAIL_HOST || 'smtp.gmail.com',
+    smtpPort: process.env.MAIL_PORT || 587,
+    usingResend: !!process.env.RESEND_API_KEY,
+  })
+})
+
 // ── POST /api/email/scan ───────────────────────────────────────────────────────
 // Manually trigger inbox scan
 emailRouter.post('/scan', requireRole('ADMIN'), async (_req, res) => {
