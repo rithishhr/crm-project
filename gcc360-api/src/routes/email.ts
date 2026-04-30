@@ -57,12 +57,19 @@ emailRouter.post('/send', async (req: AuthRequest, res) => {
       throw new Error('SMTP credentials not configured in .env')
     }
 
-    await transporter.sendMail({
+    // Add a 15-second timeout for the sendMail call
+    const sendPromise = transporter.sendMail({
       from: `"GCC360 CRM" <${process.env.MAIL_USER}>`,
       to,
       subject,
       text: body,
     })
+
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Email sending timed out after 15s')), 15000)
+    )
+
+    await Promise.race([sendPromise, timeoutPromise])
 
     // Log the activity
     await prisma.activity.create({

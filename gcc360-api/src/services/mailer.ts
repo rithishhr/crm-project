@@ -4,6 +4,14 @@ export const transporter = nodemailer.createTransport({
   host:   process.env.MAIL_HOST  || 'smtp.gmail.com',
   port:   Number(process.env.MAIL_PORT) || 465,
   secure: true,
+  pool:   true, // Use pooled connections
+  maxConnections: 3,
+  maxMessages: 100,
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 5000,
+  socketTimeout: 30000,
+  logger: true, // Log SMTP traffic
+  debug:  true, // Show debug info
   auth: {
     user: process.env.MAIL_USER || '',
     pass: process.env.MAIL_PASS || '',
