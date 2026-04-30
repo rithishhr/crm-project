@@ -2,20 +2,22 @@ import nodemailer from 'nodemailer'
 
 export const transporter = nodemailer.createTransport({
   host:   process.env.MAIL_HOST  || 'smtp.gmail.com',
-  port:   Number(process.env.MAIL_PORT) || 465,
-  secure: true,
-  pool:   true, // Use pooled connections
+  port:   Number(process.env.MAIL_PORT) || 587,
+  secure: false, // true for 465, false for other ports (STARTTLS)
+  pool:   true,
   maxConnections: 3,
-  maxMessages: 100,
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 5000,
+  connectionTimeout: 20000, // 20 seconds
+  greetingTimeout: 10000,
   socketTimeout: 30000,
-  logger: true, // Log SMTP traffic
-  debug:  true, // Show debug info
+  logger: true,
+  debug:  true,
   auth: {
     user: process.env.MAIL_USER || '',
     pass: process.env.MAIL_PASS || '',
   },
+  tls: {
+    rejectUnauthorized: false // Ignore self-signed certificate errors common in cloud relays
+  }
 })
 
 export async function sendInviteEmail(
