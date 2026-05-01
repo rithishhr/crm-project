@@ -94,49 +94,45 @@ export default function Sidebar({ currentPage, onNavigate, collapsed, onToggleCo
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-3 px-2 space-y-1.5 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 py-4 px-3 flex flex-col gap-1 overflow-y-auto overflow-x-hidden">
         {visible.map(({ key, label, icon: Icon }) => {
           const isActive = currentPage === key
           return (
-            <motion.button
+            <button
               key={key}
               onClick={() => onNavigate(key)}
-              whileHover={{ x: collapsed ? 0 : 4, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
               title={collapsed ? t(key as any) : undefined}
-              className={`sidebar-item ${collapsed ? 'justify-center' : ''} ${isActive ? 'active' : ''}`}
+              className={`
+                flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all duration-200
+                ${isActive 
+                  ? 'bg-teal-500 text-white font-bold shadow-lg shadow-teal-500/20' 
+                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}
+                ${collapsed ? 'justify-center' : ''}
+              `}
             >
-              <Icon className="w-4 h-4 flex-shrink-0" />
-              <AnimatePresence>
-                {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    className="text-sm whitespace-nowrap"
-                  >
-                    {t(key as any)}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
+              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : ''}`} />
+              {!collapsed && (
+                <span className="text-sm font-medium truncate">
+                  {t(key as any)}
+                </span>
+              )}
+            </button>
           )
         })}
       </nav>
 
       {/* Collapse */}
-      <div className="p-2" style={{ borderTop: '1px solid var(--border)' }}>
+      <div className="p-3 border-t border-slate-100">
         <button
           onClick={onToggleCollapse}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className={`sidebar-item ${collapsed ? 'justify-center' : ''}`}
+          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-all ${collapsed ? 'justify-center' : ''}`}
         >
           {collapsed
-            ? <ChevronRight className="w-4 h-4 flex-shrink-0" />
+            ? <ChevronRight className="w-5 h-5 flex-shrink-0" />
             : (
               <>
-                <ChevronLeft className="w-4 h-4 flex-shrink-0" />
-                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm">Collapse</motion.span>
+                <ChevronLeft className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm font-medium">Collapse Menu</span>
               </>
             )
           }

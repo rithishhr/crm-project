@@ -48,65 +48,104 @@ export default function LoginPage({ onSuccess, onGoToSignup }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--bg-base)' }}>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#14b8a6' }}>
-            <Zap className="w-5 h-5 text-white" />
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50">
+      <div className="w-full max-w-md">
+        {/* Official Header */}
+        <div className="flex flex-col items-center mb-10 text-center">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white border border-slate-200 shadow-sm mb-4">
+            <Zap className="w-7 h-7 text-teal-500" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>GCC360 CRM</h1>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Enterprise CRM Platform</p>
-          </div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">GCC360 <span className="text-teal-600">CRM</span></h1>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Enterprise Sales Operations</p>
         </div>
-        <div className="panel p-8">
-          <h2 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Welcome back</h2>
-          <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>Sign in to continue</p>
+
+        {/* Login Card */}
+        <div className="official-card bg-white p-10">
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-slate-900">Account Sign In</h2>
+            <p className="text-sm text-slate-500 mt-1">Enter your credentials to access the secure portal</p>
+          </div>
+
           {error && (
-            <div className="flex items-center gap-2 p-3 rounded-lg mb-4" style={{ backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}>
-              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-              <p className="text-sm text-red-400">{error}</p>
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-100 mb-6">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <p className="text-sm font-medium text-red-700">{error}</p>
             </div>
           )}
           
           {isFaceLogin ? (
-            <div className="mb-6">
-              <FaceAuth onFaceDetected={handleFaceLogin} onCancel={() => setIsFaceLogin(false)} />
-            </div>
-          ) : (
-            <>
-              <div className="mb-4">
-            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Email</label>
-            <input type="email" className="input-field" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()} autoComplete="email" />
-          </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Password</label>
-            <div className="relative">
-              <input type={showPassword ? 'text' : 'password'} className="input-field pr-10" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()} autoComplete="current-password" />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }}>
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            <div className="space-y-6">
+              <div className="p-1 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50">
+                <FaceAuth onFaceDetected={handleFaceLogin} onCancel={() => setIsFaceLogin(false)} />
+              </div>
+              <button onClick={() => setIsFaceLogin(false)} className="w-full text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors">
+                Back to Password Login
               </button>
             </div>
-          </div>
-          <button className="btn-primary w-full justify-center mb-4" onClick={handleLogin} disabled={loading}>
-            {loading ? <span className="flex items-center gap-2"><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" /></svg>Signing in...</span>
-              : <span className="flex items-center gap-2">Sign In <ArrowRight className="w-4 h-4" /></span>}
-          </button>
-          
-          <button type="button" onClick={() => setIsFaceLogin(true)} className="w-full flex items-center justify-center gap-2 py-2.5 mb-4 rounded-lg font-medium transition-colors" style={{ backgroundColor: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
-            <ScanFace className="w-4 h-4" /> Sign In with Face ID
-          </button>
-          
-          </>
+          ) : (
+            <div className="space-y-5">
+              <div>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2">Work Email</label>
+                <input 
+                  type="email" 
+                  className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all" 
+                  placeholder="name@gcc360.com" 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)} 
+                  onKeyDown={e => e.key === 'Enter' && handleLogin()} 
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider">Access Key</label>
+                  <button className="text-[10px] font-bold text-teal-600 hover:underline uppercase tracking-tight">Forgot Key?</button>
+                </div>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? 'text' : 'password'} 
+                    className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all pr-12" 
+                    placeholder="••••••••" 
+                    value={password} 
+                    onChange={e => setPassword(e.target.value)} 
+                    onKeyDown={e => e.key === 'Enter' && handleLogin()} 
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              
+              <div className="pt-2 space-y-3">
+                <button className="btn-primary w-full h-12 justify-center shadow-md shadow-teal-500/20" onClick={handleLogin} disabled={loading}>
+                  {loading ? <span className="flex items-center gap-2 font-bold"><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" /></svg>Authenticating...</span>
+                    : <span className="flex items-center gap-2 font-bold uppercase tracking-wider">Secure Sign In</span>}
+                </button>
+                
+                <div className="relative py-2">
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
+                  <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-white px-4 text-slate-300">Identity Verification</span></div>
+                </div>
+
+                <button type="button" onClick={() => setIsFaceLogin(true)} className="w-full h-12 flex items-center justify-center gap-3 rounded-xl font-bold text-sm bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10">
+                  <ScanFace className="w-5 h-5" /> Sign In with Face ID
+                </button>
+              </div>
+            </div>
           )}
         </div>
-        <p className="text-center text-sm mt-4" style={{ color: 'var(--text-muted)' }}>
-          {bootstrapMode ? 'Need a company account?' : 'New company?'}{' '}
-          <button onClick={onGoToSignup} style={{ color: 'var(--accent)' }} className="font-semibold hover:underline">
-            {bootstrapMode ? 'Create the first company admin' : 'Create a company account'}
-          </button>
-        </p>
-      </motion.div>
+
+        {/* Footer Link */}
+        <div className="text-center mt-8">
+          <p className="text-sm font-medium text-slate-500">
+            {bootstrapMode ? 'System requires initialization.' : 'Authorized personnel only.'}{' '}
+            <button onClick={onGoToSignup} className="text-teal-600 font-bold hover:underline decoration-2 underline-offset-4 ml-1">
+              {bootstrapMode ? 'Create Global Admin' : 'Register New Organization'}
+            </button>
+          </p>
+        </div>
+      </div>
     </div>
+  )
+}
   )
 }
