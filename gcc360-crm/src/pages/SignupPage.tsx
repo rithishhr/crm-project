@@ -157,5 +157,3 @@ export default function SignupPage({ onSuccess, onGoToLogin }: Props) {
     </div>
   )
 }
-  )
-}
