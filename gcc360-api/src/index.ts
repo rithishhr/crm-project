@@ -101,11 +101,15 @@ app.get('/api/health', async (_req, res) => {
   res.json({
     status: 'ok',
     time: new Date().toISOString(),
-    version: '1.0.2',
+    version: '1.0.3',
     database: dbStatus,
     aiConfigured: !!process.env.GROQ_API_KEY,
+    emailConfig: {
+      smtp: !!process.env.MAIL_USER,
+      resend: !!process.env.RESEND_API_KEY,
+    },
     configs: {
-      frontendUrl: (process.env.FRONTEND_URL || 'not set').slice(0, 15) + '...',
+      frontendUrl: frontendUrl,
       nodeEnv: process.env.NODE_ENV
     }
   })
