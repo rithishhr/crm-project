@@ -2,6 +2,7 @@ import { Router, Response, Request } from 'express'
 import bcrypt from 'bcryptjs'
 import { prisma } from '../lib/prisma'
 import { signAccessToken, signRefreshToken, verifyRefresh } from '../lib/jwt'
+import { sendWelcomeEmail } from '../services/mailer'
 
 export const authRouter = Router()
 
@@ -214,6 +215,9 @@ authRouter.post('/signup', async (req: Request, res: Response) => {
         companyId:    company.id,
       }
     })
+
+    // Send welcome email
+    await sendWelcomeEmail(user.email, user.name, company.name).catch(console.error)
 
     const payload      = { userId: user.id, role: user.role, companyId: user.companyId, isFirstLogin: user.isFirstLogin }
     const accessToken  = signAccessToken(payload)

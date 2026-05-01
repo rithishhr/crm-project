@@ -72,31 +72,92 @@ export async function sendMail(options: { to: string; subject: string; html?: st
   });
 }
 
+/**
+ * Layout helper for premium enterprise emails
+ */
+function getEmailLayout(title: string, contentHtml: string, accentColor: string = '#14b8a6') {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        .email-body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 40px 20px; color: #1e293b; }
+        .card { max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 32px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.025em; }
+        .header h1 span { color: ${accentColor}; }
+        .content { padding: 40px; }
+        .welcome { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+        .text { font-size: 16px; line-height: 1.6; color: #475569; margin-bottom: 24px; }
+        .credentials-box { background: #f1f5f9; border-radius: 12px; padding: 24px; margin: 24px 0; border: 1px solid #e2e8f0; }
+        .credential-row { margin-bottom: 12px; }
+        .credential-row:last-child { margin-bottom: 0; }
+        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 4px; }
+        .value { font-size: 15px; font-weight: 600; color: #0f172a; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+        .btn { display: inline-block; background-color: ${accentColor}; color: #ffffff !important; font-weight: 700; font-size: 15px; text-decoration: none; padding: 14px 32px; border-radius: 10px; text-align: center; margin-top: 8px; transition: all 0.2s; }
+        .footer { text-align: center; padding: 32px; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; }
+        .footer p { margin: 4px 0; }
+      </style>
+    </head>
+    <body class="email-body">
+      <div class="card">
+        <div class="header">
+          <h1>GCC360 <span>CRM</span></h1>
+        </div>
+        <div class="content">
+          ${contentHtml}
+        </div>
+        <div class="footer">
+          <p>&copy; ${new Date().getFullYear()} GCC360 Enterprise. All rights reserved.</p>
+          <p>Confidential Business Intelligence Platform</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
 export async function sendInviteEmail(
   to: string,
   name: string,
   role: string,
-  tempPassword: string
+  tempPassword: string,
+  companyName?: string
 ): Promise<void> {
-  if (!process.env.MAIL_USER) return // Email not configured, skip silently
+  if (!process.env.MAIL_USER) return
+
+  const content = `
+    <h2 class="welcome">Welcome to the Team, ${name.split(' ')[0]}!</h2>
+    <p class="text">
+      You have been invited to join <strong>${companyName || 'the GCC360 CRM platform'}</strong> as a <strong>${role.replace('_', ' ')}</strong>. 
+      Your enterprise workspace is ready for activation.
+    </p>
+    
+    <div class="credentials-box">
+      <div class="credential-row">
+        <div class="label">Access ID (Email)</div>
+        <div class="value">${to}</div>
+      </div>
+      <div class="credential-row">
+        <div class="label">Temporary Passkey</div>
+        <div class="value">${tempPassword}</div>
+      </div>
+    </div>
+
+    <p class="text" style="font-size: 14px; color: #64748b;">
+      * For security reasons, you will be required to change this password immediately upon your first login.
+    </p>
+
+    <div style="text-align: center;">
+      <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" class="btn">Enter Workspace</a>
+    </div>
+  `;
 
   await sendMail({
     to,
-    subject: 'You have been invited to GCC360 CRM',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px; background: #0f1729; color: #f1f5f9; border-radius: 12px;">
-        <h2 style="color: #14b8a6; margin-bottom: 8px;">Welcome to GCC360 CRM</h2>
-        <p>Hello <strong>${name}</strong>,</p>
-        <p>You have been added to GCC360 CRM as <strong>${role}</strong>.</p>
-        <p>Your login credentials:</p>
-        <div style="background: #1a2235; border-radius: 8px; padding: 16px; margin: 16px 0;">
-          <p style="margin: 4px 0;"><strong>Email:</strong> ${to}</p>
-          <p style="margin: 4px 0;"><strong>Temporary Password:</strong> <code style="background:#0d1117;padding:2px 6px;border-radius:4px;">${tempPassword}</code></p>
-        </div>
-        <p style="color: #94a3b8; font-size: 14px;">Please log in and change your password immediately.</p>
-        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" style="display:inline-block;background:#14b8a6;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:8px;">Login to GCC360</a>
-      </div>
-    `,
+    subject: `Official Invitation: Join ${companyName || 'GCC360 CRM'}`,
+    html: getEmailLayout('Welcome to GCC360 CRM', content, '#14b8a6'),
   })
 }
 
@@ -107,23 +168,37 @@ export async function sendResetPasswordEmail(
 ): Promise<void> {
   if (!process.env.MAIL_USER) return
 
+  const content = `
+    <h2 class="welcome">Security Update</h2>
+    <p class="text">
+      An administrator has reset your access credentials for GCC360 CRM. 
+      Your temporary password has been updated.
+    </p>
+    
+    <div class="credentials-box">
+      <div class="credential-row">
+        <div class="label">User Email</div>
+        <div class="value">${to}</div>
+      </div>
+      <div class="credential-row">
+        <div class="label">New Temporary Password</div>
+        <div class="value">${tempPassword}</div>
+      </div>
+    </div>
+
+    <p class="text" style="font-size: 14px; color: #64748b;">
+      Please use these new credentials to sign in. You will be prompted to set a permanent password.
+    </p>
+
+    <div style="text-align: center;">
+      <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" class="btn" style="background-color: #f59e0b;">Reset Access</a>
+    </div>
+  `;
+
   await sendMail({
     to,
-    subject: 'Password Reset: GCC360 CRM',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px; background: #0f1729; color: #f1f5f9; border-radius: 12px;">
-        <h2 style="color: #f59e0b; margin-bottom: 8px;">Password Reset</h2>
-        <p>Hello <strong>${name}</strong>,</p>
-        <p>Your password for GCC360 CRM has been reset by an administrator.</p>
-        <p>Your new temporary login credentials:</p>
-        <div style="background: #1a2235; border-radius: 8px; padding: 16px; margin: 16px 0;">
-          <p style="margin: 4px 0;"><strong>Email:</strong> ${to}</p>
-          <p style="margin: 4px 0;"><strong>Temporary Password:</strong> <code style="background:#0d1117;padding:2px 6px;border-radius:4px;">${tempPassword}</code></p>
-        </div>
-        <p style="color: #94a3b8; font-size: 14px;">You will be required to change this password on your next login.</p>
-        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" style="display:inline-block;background:#f59e0b;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:8px;">Login to GCC360</a>
-      </div>
-    `,
+    subject: 'Security Alert: Password Reset for GCC360 CRM',
+    html: getEmailLayout('Security Update', content, '#f59e0b'),
   })
 }
 
@@ -135,21 +210,75 @@ export async function sendLeadNotification(
 ): Promise<void> {
   if (!process.env.MAIL_USER) return
 
+  const content = `
+    <h2 class="welcome">New Lead Detected</h2>
+    <p class="text">
+      Our AI Intelligence agent has scanned and identified a high-potential lead in your inbox.
+    </p>
+    
+    <div class="credentials-box">
+      <div class="credential-row">
+        <div class="label">Company / Prospect</div>
+        <div class="value">${leadCompany}</div>
+      </div>
+      <div class="credential-row">
+        <div class="label">Contact Email</div>
+        <div class="value">${leadEmail}</div>
+      </div>
+      <div class="credential-row">
+        <div class="label">AI Credibility Score</div>
+        <div class="value" style="color: ${aiScore >= 80 ? '#10b981' : '#f59e0b'};">${aiScore}/100</div>
+      </div>
+    </div>
+
+    <p class="text">
+      Please review the requirements and approve this prospect to initiate the sales workflow.
+    </p>
+
+    <div style="text-align: center;">
+      <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" class="btn">View Lead Details</a>
+    </div>
+  `;
+
   await sendMail({
     to,
-    subject: `🔔 New Lead Detected: ${leadCompany}`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px; background: #0f1729; color: #f1f5f9; border-radius: 12px;">
-        <h2 style="color: #14b8a6;">New Lead from Email Scanner</h2>
-        <p>A new lead has been detected and verified by AI:</p>
-        <div style="background: #1a2235; border-radius: 8px; padding: 16px; margin: 16px 0;">
-          <p><strong>Company:</strong> ${leadCompany}</p>
-          <p><strong>Email:</strong> ${leadEmail}</p>
-          <p><strong>AI Score:</strong> ${aiScore}/100</p>
-        </div>
-        <p style="color: #94a3b8; font-size: 14px;">Please review and approve this lead in the CRM.</p>
-        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" style="display:inline-block;background:#14b8a6;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">View in GCC360</a>
-      </div>
-    `,
+    subject: `🔔 Lead Intelligence: ${leadCompany} detected`,
+    html: getEmailLayout('Lead Intelligence', content, '#14b8a6'),
   })
 }
+
+export async function sendWelcomeEmail(
+  to: string,
+  name: string,
+  companyName: string
+): Promise<void> {
+  if (!process.env.MAIL_USER) return
+
+  const content = `
+    <h2 class="welcome">Welcome to GCC360 CRM!</h2>
+    <p class="text">
+      Congratulations! Your organization <strong>${companyName}</strong> has been successfully registered on the GCC360 Enterprise platform. 
+      You are now ready to transform your sales operations with AI-native intelligence.
+    </p>
+    
+    <div class="credentials-box">
+      <p class="text" style="margin: 0; font-weight: 600; color: #0f172a;">Next Steps for Success:</p>
+      <ul style="padding-left: 20px; margin-top: 12px; color: #475569; font-size: 14px;">
+        <li>Invite your team members from the User Management panel</li>
+        <li>Set up your Email Scanner to automatically detect leads</li>
+        <li>Configure your Pipeline stages to match your workflow</li>
+      </ul>
+    </div>
+
+    <div style="text-align: center;">
+      <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" class="btn">Access Dashboard</a>
+    </div>
+  `;
+
+  await sendMail({
+    to,
+    subject: `Welcome to GCC360 CRM: ${companyName} is live`,
+    html: getEmailLayout('Welcome to the Platform', content, '#14b8a6'),
+  })
+}
+

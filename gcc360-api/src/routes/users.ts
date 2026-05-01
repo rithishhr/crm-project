@@ -42,6 +42,9 @@ usersRouter.post('/invite', requireRole('ADMIN'), async (req: AuthRequest, res: 
   const tempPassword   = Math.random().toString(36).slice(-8).toUpperCase()
   const passwordHash   = await bcrypt.hash(tempPassword, 12)
 
+  const company = await prisma.company.findUnique({ where: { id: req.user!.companyId } })
+  const companyName = company?.name || 'GCC360 CRM'
+
   const user = await prisma.user.create({
     data: {
       name,
@@ -56,7 +59,7 @@ usersRouter.post('/invite', requireRole('ADMIN'), async (req: AuthRequest, res: 
   })
 
   // Send invite email (won't crash if email not configured)
-  await sendInviteEmail(email, name, role, tempPassword).catch(console.error)
+  await sendInviteEmail(email, name, role, tempPassword, companyName).catch(console.error)
 
   res.status(201).json({
     user: { id: user.id, name: user.name, email: user.email, role: user.role, status: user.status },
@@ -106,6 +109,9 @@ usersRouter.post('/:id/reset-password', requireRole('ADMIN'), async (req: AuthRe
   const user = await prisma.user.findUnique({ where: { id: req.params.id } })
   if (!user) { res.status(404).json({ error: 'User not found.' }); return }
 
+  const company = await prisma.company.findUnique({ where: { id: req.user!.companyId } })
+  const companyName = company?.name || 'GCC360 CRM'
+
   const tempPassword = Math.random().toString(36).slice(-8).toUpperCase()
   const passwordHash = await bcrypt.hash(tempPassword, 12)
 
@@ -115,7 +121,7 @@ usersRouter.post('/:id/reset-password', requireRole('ADMIN'), async (req: AuthRe
   })
 
   // Send email (optional implementation in mailer.ts)
-  await sendInviteEmail(user.email, user.name, user.role, tempPassword).catch(console.error)
+  await sendInviteEmail(user.email, user.name, user.role, tempPassword, companyName).catch(console.error)
 
   res.json({ success: true, tempPassword })
 })
