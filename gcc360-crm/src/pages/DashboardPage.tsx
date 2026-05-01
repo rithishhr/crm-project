@@ -6,7 +6,7 @@ import {
 } from 'recharts'
 import {
   TrendingUp, DollarSign, Target, Users2, BarChart2,
-  ArrowRight, CheckCircle, Clock, AlertCircle, Zap, Bot, Volume2, Download
+  ArrowRight, CheckCircle, Clock, AlertCircle, Zap, Bot, Volume2, Download, Loader2
 } from 'lucide-react'
 import { FadeIn, ScaleIn, StaggerContainer } from '../components/Motion'
 import { aiApi, analyticsApi } from '../lib/api'
