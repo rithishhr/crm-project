@@ -33,7 +33,6 @@ export async function sendMail(options: { to: string; subject: string; html?: st
         },
         signal: controller.signal,
         body: JSON.stringify({
-          // Force onboarding@resend.dev if MAIL_FROM is a gmail address (Resend doesn't allow gmail)
           from: (process.env.MAIL_FROM && !process.env.MAIL_FROM.includes('gmail.com')) 
                 ? process.env.MAIL_FROM 
                 : 'GCC360 CRM <onboarding@resend.dev>',
@@ -61,7 +60,51 @@ export async function sendMail(options: { to: string; subject: string; html?: st
     }
   }
 
-  // 2. Only use SMTP if Resend is NOT configured
+  // 2. Try Brevo API (Excellent free alternative, no sandbox)
+  if (process.env.BREVO_API_KEY) {
+    console.log(`[MAIL] >>> ATTEMPTING BREVO API SEND TO: ${to} (Subject: ${subject})`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    try {
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+          'api-key': process.env.BREVO_API_KEY,
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          sender: { 
+            name: "GCC360 CRM", 
+            email: process.env.MAIL_USER || "gcc360crm@gmail.com" 
+          },
+          to: [{ email: to }],
+          subject,
+          htmlContent: html || text,
+          textContent: text,
+        }),
+      });
+
+      clearTimeout(timeout);
+      const result = await response.json() as any;
+
+      if (response.status === 201) {
+        console.log(`[MAIL] SUCCESS: Brevo API delivered to ${to}`);
+        return result;
+      }
+
+      console.error('[MAIL] BREVO ERROR:', result);
+      throw new Error(`Brevo API Error: ${result?.message || JSON.stringify(result)}`);
+    } catch (e: any) {
+      clearTimeout(timeout);
+      console.error('[MAIL] BREVO CRITICAL FAILURE:', e.message);
+      throw e;
+    }
+  }
+
+  // 3. Only use SMTP if No APIs are configured
   console.log(`[MAIL] >>> ATTEMPTING SMTP SEND TO: ${to} (via ${process.env.MAIL_HOST})`);
   const info = await transporter.sendMail({
     from: process.env.MAIL_FROM || process.env.MAIL_USER,
