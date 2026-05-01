@@ -147,15 +147,17 @@ body::after {
 
   /* Animated Sidebar */
   .sidebar-item {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200;
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 bg-transparent;
     color: var(--text-muted);
   }
   .sidebar-item:hover {
-    @apply text-primary bg-white/5 scale-[1.02];
+    @apply scale-[1.02];
+    color: var(--text-primary);
     background-color: var(--bg-hover);
   }
   .sidebar-item.active {
-    @apply text-white font-bold shadow-lg shadow-teal-500/20;
+    @apply font-bold shadow-lg shadow-teal-500/20;
+    color: #ffffff;
     background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   }
 
