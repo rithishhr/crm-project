@@ -1,17 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { User } from './types'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import PasswordChangePage from './pages/PasswordChangePage'
 import FaceIDModal from './components/ui/FaceIDModal'
 import AppShell from './components/layout/AppShell'
-import { setToken, clearToken, authApi } from './lib/api'
+import { setToken, clearToken, authApi, profileApi } from './lib/api'
 
-type AppState = 'login' | 'signup' | 'face_id' | 'password_change' | 'app'
+type AppState = 'login' | 'signup' | 'face_id' | 'password_change' | 'app' | 'loading'
 
 export default function App() {
-  const [appState,    setAppState]    = useState<AppState>('login')
+  const [appState,    setAppState]    = useState<AppState>('loading')
   const [currentUser, setCurrentUser] = useState<User | null>(null)
+
+  // Initialization: check if we have a valid session via refresh token
+  useEffect(() => {
+    const init = async () => {
+      try {
+        // profileApi.get() will trigger auto-refresh logic in req() if needed
+        const user = await profileApi.get()
+        setCurrentUser(user)
+        setAppState('app')
+      } catch (err) {
+        // If profile fetch fails, user needs to login
+        setAppState('login')
+      }
+    }
+    init()
+  }, [])
 
   const handleLoginSuccess = (user: User, accessToken: string) => {
     setToken(accessToken)
@@ -58,6 +74,17 @@ export default function App() {
     clearToken()
     setCurrentUser(null)
     setAppState('login')
+  }
+
+  if (appState === 'loading') {
+    return (
+      <div className="min-h-screen bg-[#0a0a0b] flex items-center justify-center">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 border-4 border-emerald-500/20 rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-t-emerald-500 rounded-full animate-spin"></div>
+        </div>
+      </div>
+    )
   }
 
   return (
