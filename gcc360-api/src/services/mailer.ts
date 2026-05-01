@@ -42,7 +42,7 @@ export async function sendMail(options: { to: string; subject: string; html?: st
       });
       
       clearTimeout(timeout);
-      const result = await response.json();
+      const result = await response.json() as any;
       
       if (response.ok) {
         console.log(`[MAIL] API send successful to ${to}`);
@@ -50,7 +50,7 @@ export async function sendMail(options: { to: string; subject: string; html?: st
       }
       
       console.error('[RESEND API ERROR]:', result);
-      throw new Error(`Resend API Error: ${result.message || JSON.stringify(result)}`);
+      throw new Error(`Resend API Error: ${result?.message || JSON.stringify(result)}`);
     } catch (e: any) {
       clearTimeout(timeout);
       console.error('[RESEND FAILED]:', e.message);
