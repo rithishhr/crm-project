@@ -250,9 +250,9 @@ export default function UsersPage({ addToast, currentUser }: Props) {
                   <td><p className="text-xs text-[var(--text-secondary)]">{user.department || '—'}</p></td>
                   <td>
                     <span className={`badge border text-[10px] uppercase font-bold ${
-                      user.status === 'ACTIVE' ? 'bg-teal-500/10 text-teal-400 border-teal-500/20' :
-                      user.status === 'PENDING' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                      'bg-slate-500/10 text-slate-400 border-slate-500/20'
+                      user.status === 'ACTIVE' ? 'bg-teal-500/10 text-teal-500 border-teal-500/20' :
+                      user.status === 'PENDING' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                      'bg-slate-500/10 text-slate-500 border-slate-500/20'
                     }`}>
                       {user.status}
                     </span>
@@ -281,8 +281,8 @@ export default function UsersPage({ addToast, currentUser }: Props) {
                         onClick={() => toggleStatus(user.id, user.status)}
                         className={`text-[10px] px-2 py-1 rounded transition-all font-bold ${
                           user.status === 'ACTIVE' 
-                            ? 'text-red-400 hover:bg-red-500/10 border border-red-500/10' 
-                            : 'text-teal-400 hover:bg-teal-500/10 border border-teal-500/10'
+                            ? 'text-red-500 hover:bg-red-500/10 border border-red-500/10' 
+                            : 'text-teal-500 hover:bg-teal-500/10 border border-teal-500/10'
                         }`}
                       >
                         {user.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}

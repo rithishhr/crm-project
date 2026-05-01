@@ -48,47 +48,47 @@ export default function LoginPage({ onSuccess, onGoToSignup }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[var(--bg-base)]">
       <div className="w-full max-w-md">
         {/* Official Header */}
         <div className="flex flex-col items-center mb-10 text-center">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white border border-slate-200 shadow-sm mb-4">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] shadow-sm mb-4">
             <Zap className="w-7 h-7 text-teal-500" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">GCC360 <span className="text-teal-600">CRM</span></h1>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Enterprise Sales Operations</p>
+          <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">GCC360 <span className="text-teal-600">CRM</span></h1>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1">Enterprise Sales Operations</p>
         </div>
 
         {/* Login Card */}
-        <div className="official-card bg-white p-10">
+        <div className="official-card bg-[var(--bg-card)] p-10">
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-slate-900">Account Sign In</h2>
-            <p className="text-sm text-slate-500 mt-1">Enter your credentials to access the secure portal</p>
+            <h2 className="text-xl font-bold text-[var(--text-primary)]">Account Sign In</h2>
+            <p className="text-sm text-[var(--text-muted)] mt-1">Enter your credentials to access the secure portal</p>
           </div>
 
           {error && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-100 mb-6">
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 mb-6">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <p className="text-sm font-medium text-red-700">{error}</p>
+              <p className="text-sm font-medium text-red-500">{error}</p>
             </div>
           )}
           
           {isFaceLogin ? (
             <div className="space-y-6">
-              <div className="p-1 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50">
+              <div className="p-1 rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--bg-elevated)]">
                 <FaceAuth onFaceDetected={handleFaceLogin} onCancel={() => setIsFaceLogin(false)} />
               </div>
-              <button onClick={() => setIsFaceLogin(false)} className="w-full text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors">
+              <button onClick={() => setIsFaceLogin(false)} className="w-full text-sm font-bold text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
                 Back to Password Login
               </button>
             </div>
           ) : (
             <div className="space-y-5">
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2">Work Email</label>
+                <label className="block text-[11px] font-black text-[var(--text-muted)] uppercase tracking-wider mb-2">Work Email</label>
                 <input 
                   type="email" 
-                  className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all" 
+                  className="input-field py-3" 
                   placeholder="name@gcc360.com" 
                   value={email} 
                   onChange={e => setEmail(e.target.value)} 
@@ -97,19 +97,19 @@ export default function LoginPage({ onSuccess, onGoToSignup }: Props) {
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider">Password</label>
+                  <label className="block text-[11px] font-black text-[var(--text-muted)] uppercase tracking-wider">Password</label>
                   <button className="text-[10px] font-bold text-teal-600 hover:underline uppercase tracking-tight">Forgot Password?</button>
                 </div>
                 <div className="relative">
                   <input 
                     type={showPassword ? 'text' : 'password'} 
-                    className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all pr-12" 
+                    className="input-field py-3 pr-12" 
                     placeholder="••••••••" 
                     value={password} 
                     onChange={e => setPassword(e.target.value)} 
                     onKeyDown={e => e.key === 'Enter' && handleLogin()} 
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)]">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -122,11 +122,11 @@ export default function LoginPage({ onSuccess, onGoToSignup }: Props) {
                 </button>
                 
                 <div className="relative py-2">
-                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-                  <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-white px-4 text-slate-300">Identity Verification</span></div>
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[var(--border)]"></div></div>
+                  <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-[var(--bg-card)] px-4 text-[var(--text-placeholder)]">Identity Verification</span></div>
                 </div>
 
-                <button type="button" onClick={() => setIsFaceLogin(true)} className="w-full h-12 flex items-center justify-center gap-3 rounded-xl font-bold text-sm bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10">
+                <button type="button" onClick={() => setIsFaceLogin(true)} className="w-full h-12 flex items-center justify-center gap-3 rounded-xl font-bold text-sm bg-teal-500/10 text-teal-500 border border-teal-500/20 hover:bg-teal-500/20 transition-all shadow-lg shadow-teal-500/5">
                   <ScanFace className="w-5 h-5" /> Sign In with Face ID
                 </button>
               </div>
@@ -136,7 +136,7 @@ export default function LoginPage({ onSuccess, onGoToSignup }: Props) {
 
         {/* Footer Link */}
         <div className="text-center mt-8">
-          <p className="text-sm font-medium text-slate-500">
+          <p className="text-sm font-medium text-[var(--text-muted)]">
             {bootstrapMode ? 'System requires initialization.' : 'Authorized personnel only.'}{' '}
             <button onClick={onGoToSignup} className="text-teal-600 font-bold hover:underline decoration-2 underline-offset-4 ml-1">
               {bootstrapMode ? 'Create Global Admin' : 'Register New Organization'}

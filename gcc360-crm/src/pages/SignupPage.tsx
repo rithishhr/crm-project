@@ -71,87 +71,85 @@ export default function SignupPage({ onSuccess, onGoToLogin }: Props) {
   const INDUSTRIES = ['Oil & Gas', 'Energy', 'Construction', 'Finance', 'Healthcare', 'Government', 'Retail', 'Technology', 'Other']
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[var(--bg-base)]">
+      <div className="w-full max-w-lg">
         {/* Official Header */}
         <div className="flex flex-col items-center mb-10 text-center">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white border border-slate-200 shadow-sm mb-4">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[var(--bg-card)] border border-[var(--border)] shadow-sm mb-4">
             <Zap className="w-7 h-7 text-teal-500" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">GCC360 <span className="text-teal-600">CRM</span></h1>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">New Organization Enrollment</p>
+          <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">GCC360 <span className="text-teal-600">CRM</span></h1>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mt-1">New Organization Enrollment</p>
         </div>
 
-        {/* Signup Card */}
-        <div className="official-card bg-white p-10">
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-slate-900">Get Started</h2>
-            <p className="text-sm text-slate-500 mt-1">
-              {bootstrapMode ? 'Initialize the global administrator account.' : "Register your organization to access the platform."}
+        <div className="official-card bg-[var(--bg-card)] p-10">
+          <div className="mb-8 text-center">
+            <h2 className="text-xl font-bold text-[var(--text-primary)]">Get Started</h2>
+            <p className="text-sm text-[var(--text-muted)] mt-1">
+              Create your enterprise workspace and admin account
             </p>
           </div>
 
           {error && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-100 mb-6">
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 mb-6">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <p className="text-sm font-medium text-red-700">{error}</p>
+              <p className="text-sm font-medium text-red-500">{error}</p>
             </div>
           )}
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2">Full Name</label>
-                <input type="text" className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all" placeholder="Ahmed Al-Rashidi" value={form.name} onChange={set('name')} />
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="md:col-span-2">
+                <label className="block text-[11px] font-black text-[var(--text-muted)] uppercase tracking-wider mb-2">Full Name</label>
+                <input type="text" className="input-field py-3" placeholder="Ahmed Al-Rashidi" value={form.name} onChange={set('name')} />
               </div>
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2">Work Email</label>
-                <input type="email" className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all" placeholder="ahmed@yourcompany.com" value={form.email} onChange={set('email')} />
+              <div className="md:col-span-2">
+                <label className="block text-[11px] font-black text-[var(--text-muted)] uppercase tracking-wider mb-2">Work Email</label>
+                <input type="email" className="input-field py-3" placeholder="ahmed@yourcompany.com" value={form.email} onChange={set('email')} />
               </div>
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2">Secure Password</label>
+              <div className="md:col-span-2">
+                <label className="block text-[11px] font-black text-[var(--text-muted)] uppercase tracking-wider mb-2">Secure Password</label>
                 <div className="relative">
-                  <input type={showPassword ? 'text' : 'password'} className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all pr-12" placeholder="Min. 6 characters" value={form.password} onChange={set('password')} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                  <input type={showPassword ? 'text' : 'password'} className="input-field py-3 pr-12" placeholder="Min. 6 characters" value={form.password} onChange={set('password')} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)]">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2">Organization Name</label>
-                <input type="text" className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all" placeholder="ADNOC, Aramco, Your Corp" value={form.companyName} onChange={set('companyName')} />
-                <div className="mt-2 text-[10px] font-bold" style={{ color: companyHint ? '#f59e0b' : '#94a3b8' }}>
-                  {checkingCompany ? 'Verifying availability...' : companyHint || 'Must be a registered legal entity name.'}
-                </div>
+              <div className="md:col-span-2">
+                <label className="block text-[11px] font-black text-[var(--text-muted)] uppercase tracking-wider mb-2">Organization Name</label>
+                <input type="text" className="input-field py-3" placeholder="ADNOC, Aramco, Your Corp" value={form.companyName} onChange={set('companyName')} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2">Region</label>
-                  <select className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all" value={form.country} onChange={set('country')}>
-                    {COUNTRIES.map(c => <option key={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2">Sector</label>
-                  <select className="input-field py-3 bg-slate-50 border-slate-200 focus:bg-white transition-all" value={form.industry} onChange={set('industry')}>
-                    {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
-                  </select>
-                </div>
+              <div>
+                <label className="block text-[11px] font-black text-[var(--text-muted)] uppercase tracking-wider mb-2">Region</label>
+                <select className="input-field py-3" value={form.country} onChange={set('country')}>
+                  {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-black text-[var(--text-muted)] uppercase tracking-wider mb-2">Sector</label>
+                <select className="input-field py-3" value={form.industry} onChange={set('industry')}>
+                  {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
+                </select>
               </div>
             </div>
 
-            <button className="btn-primary w-full h-12 justify-center mt-6 shadow-md shadow-teal-500/20" onClick={handleSignup} disabled={loading}>
-              {loading ? <span className="flex items-center gap-2 font-bold"><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" /></svg>Registering...</span>
-                : <span className="flex items-center gap-2 font-bold uppercase tracking-wider text-sm">Create Organization Account</span>}
-            </button>
+            <div className="pt-2">
+              <button className="btn-primary w-full h-12 justify-center shadow-md shadow-teal-500/20" onClick={handleSignup} disabled={loading}>
+                {loading ? <span className="flex items-center gap-2 font-bold"><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" /></svg>Provisioning...</span>
+                  : <span className="flex items-center gap-2 font-bold uppercase tracking-wider">Initialize Workspace</span>}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Footer Link */}
         <div className="text-center mt-8">
-          <button onClick={onGoToLogin} className="flex items-center gap-2 mx-auto text-sm font-bold text-teal-600 hover:underline decoration-2 underline-offset-4">
-            <ArrowLeft className="w-4 h-4" /> Back to Secure Sign In
-          </button>
+          <p className="text-sm font-medium text-[var(--text-muted)]">
+            Already have an account?{' '}
+            <button onClick={onGoToLogin} className="text-teal-600 font-bold hover:underline decoration-2 underline-offset-4 ml-1">
+              Sign In to Portal
+            </button>
+          </p>
         </div>
       </div>
     </div>

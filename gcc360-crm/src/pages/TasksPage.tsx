@@ -11,10 +11,10 @@ interface Props {
 }
 
 const priorityConfig: Record<Priority, { class: string; label: string }> = {
-  low: { class: 'bg-slate-500/10 text-[var(--text-muted)] border-slate-500/20', label: 'Low' },
-  medium: { class: 'bg-blue-500/10 text-blue-400 border-blue-500/20', label: 'Medium' },
-  high: { class: 'bg-amber-500/10 text-amber-400 border-amber-500/20', label: 'High' },
-  critical: { class: 'bg-red-500/10 text-red-400 border-red-500/20', label: 'Critical' },
+  low: { class: 'bg-[var(--border)] text-[var(--text-muted)] border-[var(--border)]', label: 'Low' },
+  medium: { class: 'bg-blue-500/10 text-blue-500 border-blue-500/20', label: 'Medium' },
+  high: { class: 'bg-amber-500/10 text-amber-500 border-amber-500/20', label: 'High' },
+  critical: { class: 'bg-red-500/10 text-red-500 border-red-500/20', label: 'Critical' },
 }
 
 const EMPTY_FORM = {
@@ -71,12 +71,12 @@ function TaskFormDrawer({ task, users, onSave, onClose }: {
               <p className="text-xs text-[var(--text-muted)]">Assign and schedule your work</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-[var(--text-muted)] hover:text-white"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="p-6 space-y-6">
           {error && (
-            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
+            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center gap-2">
               <X className="w-4 h-4" /> {error}
             </div>
           )}
@@ -247,7 +247,7 @@ export default function TasksPage({ addToast, canEdit }: Props) {
         <div className="flex items-center gap-2">
           {tasks.length > 0 && (
             <button 
-              className={`btn-secondary ${isSelectionMode ? 'bg-amber-500/10 text-amber-400' : ''}`} 
+              className={`btn-secondary ${isSelectionMode ? 'bg-amber-500/10 text-amber-500' : ''}`} 
               onClick={() => { setIsSelectionMode(!isSelectionMode); setSelectedIds([]) }}
             >
               <CheckCircle className="w-4 h-4" /> {isSelectionMode ? 'Cancel Selection' : 'Bulk Action'}
@@ -277,12 +277,12 @@ export default function TasksPage({ addToast, canEdit }: Props) {
               onClick={() => isSelectionMode && toggleSelect(task.id)}
             >
               {isSelectionMode ? (
-                <div className={`w-5 h-5 rounded border ${selectedIds.includes(task.id) ? 'bg-teal-500 border-teal-500' : 'bg-black/20 border-white/20'} flex items-center justify-center transition-all`}>
-                  {selectedIds.includes(task.id) && <CheckCircle className="w-4 h-4 text-slate-900" />}
+                <div className={`w-5 h-5 rounded border ${selectedIds.includes(task.id) ? 'bg-teal-500 border-teal-500' : 'bg-[var(--bg-elevated)] border-[var(--border)]'} flex items-center justify-center transition-all`}>
+                  {selectedIds.includes(task.id) && <CheckCircle className="w-4 h-4 text-white" />}
                 </div>
               ) : (
-                <button onClick={(e) => { e.stopPropagation(); toggleDone(task) }} className="text-[var(--text-muted)] hover:text-teal-400 transition-colors flex-shrink-0">
-                  {task.status === 'done' ? <CheckCircle2 className="w-5 h-5 text-teal-400" /> : <Circle className="w-5 h-5" />}
+                <button onClick={(e) => { e.stopPropagation(); toggleDone(task) }} className="text-[var(--text-muted)] hover:text-teal-500 transition-colors flex-shrink-0">
+                  {task.status === 'done' ? <CheckCircle2 className="w-5 h-5 text-teal-500" /> : <Circle className="w-5 h-5" />}
                 </button>
               )}
 
@@ -304,10 +304,10 @@ export default function TasksPage({ addToast, canEdit }: Props) {
                   {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No date'}
                 </p>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => { setEditTask(task); setShowForm(true) }} className="p-1 rounded hover:bg-[var(--bg-elevated)] text-[var(--text-muted)] hover:text-white">
+                  <button onClick={() => { setEditTask(task); setShowForm(true) }} className="p-1 rounded hover:bg-[var(--bg-elevated)] text-[var(--text-muted)] hover:text-[var(--text-primary)]">
                     <Edit3 className="w-3.5 h-3.5" />
                   </button>
-                  <button onClick={() => handleDelete(task.id)} className="p-1 rounded hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-400">
+                  <button onClick={() => handleDelete(task.id)} className="p-1 rounded hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-500">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -323,22 +323,26 @@ export default function TasksPage({ addToast, canEdit }: Props) {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-[var(--border)] rounded-2xl shadow-2xl px-6 py-4 flex items-center gap-6"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-2xl px-6 py-4 flex items-center gap-6"
           >
-            <span className="text-sm font-medium text-white">{selectedIds.length} tasks selected</span>
-            <div className="h-6 w-px bg-slate-700" />
-            <button
-              onClick={handleBulkDelete}
-              className="flex items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300 transition-colors"
-            >
-              <Trash2 className="w-4 h-4" /> Delete Selected
-            </button>
-            <button
-              onClick={() => { setSelectedIds([]); setIsSelectionMode(false) }}
-              className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
-            >
-              Cancel
-            </button>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-[var(--text-primary)]">{selectedIds.length} tasks selected</span>
+            </div>
+            <div className="h-6 w-px bg-[var(--border)]" />
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleBulkDelete}
+                className="text-sm font-medium text-red-500 hover:text-red-400 transition-colors flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" /> Delete All
+              </button>
+              <button
+                onClick={() => { setSelectedIds([]); setIsSelectionMode(false) }}
+                className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
+              >
+                Deselect
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

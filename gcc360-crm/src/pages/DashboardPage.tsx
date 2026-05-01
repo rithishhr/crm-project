@@ -139,34 +139,34 @@ export default function DashboardPage({ user, onNavigate }: Props) {
       <div className="official-card p-6 mb-6">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-inner" style={{ background: 'linear-gradient(135deg, #0ea5e9, #14b8a6)' }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-inner" style={{ background: 'linear-gradient(135deg, #14b8a6, #0ea5e9)' }}>
               <Bot className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Intelligent CRM Summary</h2>
-              <p className="text-xs text-slate-500 font-medium tracking-tight">Automated business intelligence for your daily briefing</p>
+              <h2 className="text-lg font-bold text-[var(--text-primary)]">Intelligent CRM Summary</h2>
+              <p className="text-xs text-[var(--text-muted)] font-medium tracking-tight">Automated business intelligence for your daily briefing</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={speakSummary} className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition-colors flex items-center gap-2" disabled={!aiSummary?.summaryText}>
+            <button onClick={speakSummary} className="btn-secondary px-4 py-1.5 text-xs" disabled={!aiSummary?.summaryText}>
               <Volume2 className="w-3.5 h-3.5" /> {speaking ? 'Stop' : 'Play Audio'}
             </button>
-            <button onClick={exportSummaryPdf} className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition-colors flex items-center gap-2" disabled={!aiSummary}>
+            <button onClick={exportSummaryPdf} className="btn-secondary px-4 py-1.5 text-xs" disabled={!aiSummary}>
               <Download className="w-3.5 h-3.5" /> PDF
             </button>
           </div>
         </div>
 
         {aiLoading ? (
-          <div className="flex items-center gap-3 text-sm text-slate-400 py-4">
-            <Loader2 className="w-4 h-4 animate-spin text-teal-500" />
+          <div className="flex items-center gap-3 text-sm py-4" style={{ color: 'var(--text-muted)' }}>
+            <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--accent)' }} />
             Synthesizing intelligence report...
           </div>
         ) : aiSummary ? (
           <div className="space-y-4">
-            <div className="p-4 rounded-xl border border-teal-100 bg-teal-50/30">
-              <p className="text-sm font-bold text-teal-900 mb-1">{aiSummary.greeting}</p>
-              <p className="text-sm leading-relaxed text-teal-800">{aiSummary.summaryText}</p>
+            <div className="p-4 rounded-xl border border-teal-500/20 bg-teal-500/5">
+              <p className="text-sm font-bold text-teal-500 mb-1">{aiSummary.greeting}</p>
+              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{aiSummary.summaryText}</p>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -180,15 +180,15 @@ export default function DashboardPage({ user, onNavigate }: Props) {
                 { label: 'Revenue Intake', value: fmt(aiSummary.metrics?.revenueGenerated || 0) },
                 { label: 'Comm. Volume', value: aiSummary.metrics?.emailsSent || 0 },
               ].map((item) => (
-                <div key={item.label} className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
-                  <p className="text-sm font-black text-slate-800">{item.value}</p>
+                <div key={item.label} className="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl p-3 shadow-sm">
+                  <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">{item.label}</p>
+                  <p className="text-sm font-black text-[var(--text-primary)]">{item.value}</p>
                 </div>
               ))}
             </div>
           </div>
         ) : (
-          <p className="text-sm text-slate-400 italic">No intelligence briefing available for the current cycle.</p>
+          <p className="text-sm text-[var(--text-muted)] italic">No intelligence briefing available for the current cycle.</p>
         )}
       </div>
 
@@ -202,13 +202,13 @@ export default function DashboardPage({ user, onNavigate }: Props) {
         ].map((kpi) => (
           <div key={kpi.label} className="official-card p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50 border border-slate-100">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--bg-elevated)] border border-[var(--border)]">
                 <kpi.icon className="w-5 h-5" style={{ color: kpi.color }} />
               </div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live</span>
+              <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Live</span>
             </div>
-            <p className="text-2xl font-bold text-slate-900 tracking-tight">{kpi.value}</p>
-            <p className="text-xs font-semibold text-slate-500 uppercase mt-1">{kpi.label}</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">{kpi.value}</p>
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase mt-1">{kpi.label}</p>
           </div>
         ))}
       </div>
@@ -218,31 +218,31 @@ export default function DashboardPage({ user, onNavigate }: Props) {
         <div className="official-card p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Revenue Performance</h2>
-              <p className="text-xs text-slate-500">Monthly breakdown of gross revenue across all sectors</p>
+              <h2 className="text-lg font-bold text-[var(--text-primary)]">Revenue Performance</h2>
+              <p className="text-xs text-[var(--text-muted)]">Monthly breakdown of gross revenue across all sectors</p>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20">
                 <div className="w-1.5 h-1.5 rounded-full bg-teal-500" />
-                <span className="text-[10px] font-bold text-teal-700 uppercase">Growth</span>
+                <span className="text-[10px] font-bold text-teal-500 uppercase">Growth</span>
               </div>
             </div>
           </div>
           {revenue.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={revenue}>
-                <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} axisLine={false} tickLine={false}
+                <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'var(--text-muted)', fontWeight: 600 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)', fontWeight: 600 }} axisLine={false} tickLine={false}
                   tickFormatter={v => v >= 1000000 ? `${(v/1000000).toFixed(0)}M` : `${(v/1000).toFixed(0)}K`} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                  itemStyle={{ fontSize: 12, fontWeight: 600 }}
+                  contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, boxShadow: 'var(--shadow-lg)' }}
+                  itemStyle={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}
                 />
-                <Line type="monotone" dataKey="amount" stroke="#14b8a6" strokeWidth={3} dot={{ r: 4, fill: '#14b8a6', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="amount" stroke="var(--accent)" strokeWidth={3} dot={{ r: 4, fill: 'var(--accent)', strokeWidth: 2, stroke: 'var(--bg-card)' }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-56 flex flex-col items-center justify-center text-slate-400">
+            <div className="h-56 flex flex-col items-center justify-center" style={{ color: 'var(--text-muted)' }}>
               <BarChart2 className="w-8 h-8 mb-2 opacity-20" />
               <p className="text-sm font-medium">Insufficient data for revenue modeling</p>
             </div>
@@ -250,8 +250,8 @@ export default function DashboardPage({ user, onNavigate }: Props) {
         </div>
 
         <div className="official-card p-6">
-          <h2 className="text-lg font-bold text-slate-900 mb-1">Pipeline Health</h2>
-          <p className="text-xs text-slate-500 mb-6">Distribution by deal stage</p>
+          <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Pipeline Health</h2>
+          <p className="text-xs text-[var(--text-muted)] mb-6">Distribution by deal stage</p>
           {stages.filter((s: any) => s.count > 0).length > 0 ? (
             <div className="space-y-4">
               <ResponsiveContainer width="100%" height={140}>
@@ -265,18 +265,18 @@ export default function DashboardPage({ user, onNavigate }: Props) {
               </ResponsiveContainer>
               <div className="grid grid-cols-1 gap-2 pt-2">
                 {stages.filter((s: any) => s.count > 0).map((s: any) => (
-                  <div key={s.stage} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                  <div key={s.stage} className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)]">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: STAGE_COLORS[s.stage] || '#94a3b8' }} />
-                      <span className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">{s.stage.replace('_', ' ')}</span>
+                      <span className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-tight">{s.stage.replace('_', ' ')}</span>
                     </div>
-                    <span className="text-xs font-black text-slate-900">{s.count}</span>
+                    <span className="text-xs font-black text-[var(--text-primary)]">{s.count}</span>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="h-48 flex flex-col items-center justify-center text-slate-400 text-center">
+            <div className="h-48 flex flex-col items-center justify-center text-center" style={{ color: 'var(--text-muted)' }}>
               <Target className="w-8 h-8 mb-2 opacity-20" />
               <p className="text-sm font-medium px-4">No active opportunities in the pipeline</p>
             </div>

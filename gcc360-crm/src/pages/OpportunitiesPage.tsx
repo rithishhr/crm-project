@@ -487,22 +487,27 @@ export default function OpportunitiesPage({ addToast, canEdit }: Props) {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-[var(--border)] rounded-2xl shadow-2xl px-6 py-4 flex items-center gap-6"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-2xl px-6 py-4 flex items-center gap-6"
           >
-            <span className="text-sm font-medium text-white">{selectedIds.length} items selected</span>
-            <div className="h-6 w-px bg-slate-700" />
-            <button
-              onClick={handleBulkDelete}
-              className="flex items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300 transition-colors"
-            >
-              <Trash2 className="w-4 h-4" /> Delete Selected
-            </button>
-            <button
-              onClick={() => setSelectedIds([])}
-              className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
-            >
-              Cancel
-            </button>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-[var(--text-primary)]">{selectedIds.length} deals selected</span>
+              <span className="text-[10px] text-[var(--text-muted)] font-medium">Bulk optimization ready</span>
+            </div>
+            <div className="h-6 w-px bg-[var(--border)]" />
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleBulkDelete}
+                className="text-sm font-medium text-red-500 hover:text-red-400 transition-colors flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" /> Delete All
+              </button>
+              <button
+                onClick={() => setSelectedIds([])}
+                className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
+              >
+                Deselect
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
