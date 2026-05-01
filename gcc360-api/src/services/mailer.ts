@@ -21,6 +21,9 @@ export async function sendMail(options: { to: string; subject: string; html?: st
   // 1. Try Resend API first (Bypasses all Port Blocks)
   if (process.env.RESEND_API_KEY) {
     console.log(`[MAIL] Attempting API send to ${to} via Resend...`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
     try {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -28,6 +31,7 @@ export async function sendMail(options: { to: string; subject: string; html?: st
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
         },
+        signal: controller.signal,
         body: JSON.stringify({
           from: process.env.MAIL_FROM || 'GCC360 CRM <onboarding@resend.dev>',
           to,
@@ -37,11 +41,19 @@ export async function sendMail(options: { to: string; subject: string; html?: st
         }),
       });
       
-      if (response.ok) return await response.json();
+      clearTimeout(timeout);
+      
+      if (response.ok) {
+        console.log(`[MAIL] API send successful to ${to}`);
+        return await response.json();
+      }
+      
       const error = await response.text();
       console.warn('[RESEND API ERROR]:', error);
+      // Don't return, let it fall back to SMTP if API fails
     } catch (e: any) {
-      console.error('[RESEND FETCH FAILED]:', e.message);
+      clearTimeout(timeout);
+      console.error('[RESEND FETCH FAILED/TIMEOUT]:', e.message);
     }
   }
 
