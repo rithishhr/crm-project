@@ -97,8 +97,8 @@ export default function LoginPage({ onSuccess, onGoToSignup }: Props) {
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider">Access Key</label>
-                  <button className="text-[10px] font-bold text-teal-600 hover:underline uppercase tracking-tight">Forgot Key?</button>
+                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider">Password</label>
+                  <button className="text-[10px] font-bold text-teal-600 hover:underline uppercase tracking-tight">Forgot Password?</button>
                 </div>
                 <div className="relative">
                   <input 
