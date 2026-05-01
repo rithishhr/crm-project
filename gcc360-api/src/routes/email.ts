@@ -5,10 +5,9 @@ import { triggerScan } from '../services/emailScanner'
 import { sendMail } from '../services/mailer'
 
 export const emailRouter = Router()
-emailRouter.use(authenticate)
 
 // ── GET /api/email/config ────────────────────────────────────────────────────
-// Temporarily public for troubleshooting
+// Public for troubleshooting - will be removed after fix
 emailRouter.get('/config', async (_req, res) => {
   res.json({
     smtpConfigured: !!process.env.MAIL_USER,
@@ -18,6 +17,8 @@ emailRouter.get('/config', async (_req, res) => {
     usingResend: !!process.env.RESEND_API_KEY,
   })
 })
+
+emailRouter.use(authenticate)
 
 // ── POST /api/email/scan ───────────────────────────────────────────────────────
 // Manually trigger inbox scan
