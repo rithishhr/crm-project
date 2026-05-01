@@ -22,7 +22,7 @@ export async function sendMail(options: { to: string; subject: string; html?: st
   if (process.env.RESEND_API_KEY) {
     console.log(`[MAIL] Attempting API send to ${to} via Resend...`);
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeout = setTimeout(() => controller.abort(), 10000);
 
     try {
       const response = await fetch('https://api.resend.com/emails', {
@@ -42,23 +42,24 @@ export async function sendMail(options: { to: string; subject: string; html?: st
       });
       
       clearTimeout(timeout);
+      const result = await response.json();
       
       if (response.ok) {
         console.log(`[MAIL] API send successful to ${to}`);
-        return await response.json();
+        return result;
       }
       
-      const error = await response.text();
-      console.warn('[RESEND API ERROR]:', error);
-      // Don't return, let it fall back to SMTP if API fails
+      console.error('[RESEND API ERROR]:', result);
+      throw new Error(`Resend API Error: ${result.message || JSON.stringify(result)}`);
     } catch (e: any) {
       clearTimeout(timeout);
-      console.error('[RESEND FETCH FAILED/TIMEOUT]:', e.message);
+      console.error('[RESEND FAILED]:', e.message);
+      throw e; // Don't fallback to SMTP if Resend was explicitly requested
     }
   }
 
-  // 2. Fallback to SMTP
-  console.log(`[MAIL] Falling back to SMTP send to ${to}...`);
+  // 2. Only use SMTP if Resend is NOT configured
+  console.log(`[MAIL] Using SMTP send to ${to}...`);
   return transporter.sendMail({
     from: process.env.MAIL_FROM || process.env.MAIL_USER,
     to,
