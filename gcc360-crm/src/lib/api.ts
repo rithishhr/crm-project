@@ -39,7 +39,6 @@ async function req<T = any>(path: string, opts: RequestInit = {}): Promise<T> {
         return req(path, opts)
       }
       clearToken()
-      window.location.href = '/'
       throw new Error('Session expired')
     }
 
