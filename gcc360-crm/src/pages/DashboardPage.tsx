@@ -8,6 +8,7 @@ import {
   TrendingUp, DollarSign, Target, Users2, BarChart2,
   ArrowRight, CheckCircle, Clock, AlertCircle, Zap, Bot, Volume2, Download
 } from 'lucide-react'
+import { FadeIn, ScaleIn, StaggerContainer } from '../components/Motion'
 import { aiApi, analyticsApi } from '../lib/api'
 import { useLanguage } from '../context/LanguageContext'
 import type { User } from '../types'
@@ -135,71 +136,95 @@ export default function DashboardPage({ user, onNavigate }: Props) {
       </div>
 
       {/* Smart CRM Analytics AI */}
-      <div className="panel p-5">
-        <div className="flex items-center justify-between gap-4 mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0ea5e9, #14b8a6)' }}>
-              <Bot className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="font-semibold" style={{ color: 'var(--text-primary)' }}>Smart CRM Analytics AI</h2>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Auto summary of what happened while you were away</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={speakSummary} className="btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" disabled={!aiSummary?.summaryText}>
-              <Volume2 className="w-3.5 h-3.5" /> {speaking ? 'Stop' : 'Read My CRM Summary'}
-            </button>
-            <button onClick={exportSummaryPdf} className="btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" disabled={!aiSummary}>
-              <Download className="w-3.5 h-3.5" /> Export PDF
-            </button>
-          </div>
-        </div>
-
-        {aiLoading ? (
-          <div className="text-sm" style={{ color: 'var(--text-muted)' }}>Analyzing CRM data...</div>
-        ) : aiSummary ? (
-          <div className="space-y-3">
-            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{aiSummary.greeting}</p>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{aiSummary.summaryText}</p>
-            {aiSummary.aiNarrative && (
-              <div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
-                <p className="text-xs whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>{aiSummary.aiNarrative}</p>
+      <FadeIn delay={0.1}>
+        <div className="panel p-5 glass-panel">
+          {/* ... existing content ... */}
+          <div className="flex items-center justify-between gap-4 mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0ea5e9, #14b8a6)' }}>
+                <Bot className="w-5 h-5 text-white" />
               </div>
-            )}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {[
-                { label: 'Hot Leads', value: aiSummary.metrics?.hotLeads || 0 },
-                { label: 'Leads Won', value: aiSummary.metrics?.leadsWon || 0 },
-                { label: 'Leads Lost', value: aiSummary.metrics?.leadsLost || 0 },
-                { label: 'Pending Follow-ups', value: aiSummary.metrics?.pendingFollowUps || 0 },
-                { label: 'Tasks Overdue', value: aiSummary.metrics?.tasksOverdue || 0 },
-                { label: 'Deals Closed (Month)', value: aiSummary.metrics?.dealsClosedThisMonth || 0 },
-                { label: 'Revenue (Month)', value: fmt(aiSummary.metrics?.revenueGenerated || 0) },
-                { label: 'Emails Sent', value: aiSummary.metrics?.emailsSent || 0 },
-              ].map((item) => (
-                <div key={item.label} className="rounded-lg p-2.5" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
-                  <p className="text-[10px] uppercase" style={{ color: 'var(--text-muted)' }}>{item.label}</p>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{item.value}</p>
-                </div>
-              ))}
+              <div>
+                <h2 className="font-semibold" style={{ color: 'var(--text-primary)' }}>Smart CRM Analytics AI</h2>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Auto summary of what happened while you were away</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={speakSummary} className="btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" disabled={!aiSummary?.summaryText}>
+                <Volume2 className="w-3.5 h-3.5" /> {speaking ? 'Stop' : 'Read My CRM Summary'}
+              </button>
+              <button onClick={exportSummaryPdf} className="btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" disabled={!aiSummary}>
+                <Download className="w-3.5 h-3.5" /> Export PDF
+              </button>
             </div>
           </div>
-        ) : (
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>AI summary unavailable right now.</p>
-        )}
-      </div>
+
+          {aiLoading ? (
+            <div className="text-sm" style={{ color: 'var(--text-muted)' }}>Analyzing CRM data...</div>
+          ) : aiSummary ? (
+            <div className="space-y-3">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{aiSummary.greeting}</p>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{aiSummary.summaryText}</p>
+              {aiSummary.aiNarrative && (
+                <div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+                  <p className="text-xs whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>{aiSummary.aiNarrative}</p>
+                </div>
+              )}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {[
+                  { label: 'Hot Leads', value: aiSummary.metrics?.hotLeads || 0 },
+                  { label: 'Leads Won', value: aiSummary.metrics?.leadsWon || 0 },
+                  { label: 'Leads Lost', value: aiSummary.metrics?.leadsLost || 0 },
+                  { label: 'Pending Follow-ups', value: aiSummary.metrics?.pendingFollowUps || 0 },
+                  { label: 'Tasks Overdue', value: aiSummary.metrics?.tasksOverdue || 0 },
+                  { label: 'Deals Closed (Month)', value: aiSummary.metrics?.dealsClosedThisMonth || 0 },
+                  { label: 'Revenue (Month)', value: fmt(aiSummary.metrics?.revenueGenerated || 0) },
+                  { label: 'Emails Sent', value: aiSummary.metrics?.emailsSent || 0 },
+                ].map((item, idx) => (
+                  <motion.div 
+                    key={item.label} 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 + idx * 0.05 }}
+                    className="rounded-lg p-2.5" 
+                    style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border)' }}
+                  >
+                    <p className="text-[10px] uppercase" style={{ color: 'var(--text-muted)' }}>{item.label}</p>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{item.value}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>AI summary unavailable right now.</p>
+          )}
+        </div>
+      </FadeIn>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <motion.div 
+        variants={{
+          show: { transition: { staggerChildren: 0.1 } }
+        }}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+      >
         {[
           { label: 'Pipeline Value',  value: fmt(kpis.pipelineValue || 0), icon: DollarSign, color: '#14b8a6', change: '+18%', up: true },
           { label: 'Total Revenue',   value: fmt(kpis.totalRevenue  || 0), icon: TrendingUp, color: '#10b981', change: '+12%', up: true },
           { label: 'Total Leads',     value: String(kpis.totalLeads || 0), icon: Target,     color: '#3b82f6', change: `${kpis.conversionRate || 0}% converted`, up: true },
           { label: 'Active Clients',  value: String(kpis.clients    || 0), icon: Users2,     color: '#f59e0b', change: `${kpis.totalDeals || 0} deals`, up: true },
-        ].map((kpi, i) => (
-          <motion.div key={kpi.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-            className="panel p-5">
+        ].map((kpi) => (
+          <motion.div 
+            key={kpi.label} 
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              show: { opacity: 1, y: 0 }
+            }}
+            whileHover={{ scale: 1.02, translateY: -5 }}
+            className="kpi-card"
+          >
             <div className="flex items-start justify-between mb-3">
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{kpi.label}</p>
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${kpi.color}15` }}>
@@ -210,7 +235,7 @@ export default function DashboardPage({ user, onNavigate }: Props) {
             <p className="text-xs font-medium" style={{ color: kpi.up ? '#10b981' : '#ef4444' }}>{kpi.change}</p>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

@@ -70,57 +70,56 @@ export default function Sidebar({ currentPage, onNavigate, collapsed, onToggleCo
       }}
     >
       {/* Logo */}
-      <div className="h-14 flex items-center px-3.5 flex-shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: accent.color }}>
-          <Zap className="w-3.5 h-3.5 text-white" />
-        </div>
+      <div className="h-16 flex items-center px-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+        <motion.div 
+          whileHover={{ scale: 1.15, rotate: 12 }}
+          className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-teal-500/30" 
+          style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))' }}
+        >
+          <Zap className="w-4 h-4 text-white" />
+        </motion.div>
         <AnimatePresence>
           {!collapsed && (
             <motion.div
-              initial={{ opacity: 0, x: -8 }}
+              initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.15 }}
-              className="ml-2.5 overflow-hidden"
+              exit={{ opacity: 0, x: -10 }}
+              className="ml-3 overflow-hidden"
             >
-              <p className="text-sm font-bold whitespace-nowrap" style={{ color: 'var(--text-primary)' }}>GCC360 CRM</p>
+              <p className="text-sm font-black tracking-tight whitespace-nowrap" style={{ color: 'var(--text-primary)' }}>GCC360 CRM</p>
+              <div className="h-1 w-8 bg-teal-500/50 rounded-full mt-0.5" />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 py-3 px-2 space-y-1.5 overflow-y-auto overflow-x-hidden">
         {visible.map(({ key, label, icon: Icon }) => {
           const isActive = currentPage === key
           return (
-            <button
+            <motion.button
               key={key}
               onClick={() => onNavigate(key)}
+              whileHover={{ x: collapsed ? 0 : 4, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               title={collapsed ? t(key as any) : undefined}
-              className={`sidebar-item ${collapsed ? 'justify-center' : ''}`}
-              style={isActive ? {
-                color: accent.color,
-                backgroundColor: accent.bg,
-                borderColor: accent.border,
-                fontWeight: 600,
-              } : {}}
+              className={`sidebar-item ${collapsed ? 'justify-center' : ''} ${isActive ? 'active' : ''}`}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
               <AnimatePresence>
                 {!collapsed && (
                   <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.1 }}
-                    className="text-sm whitespace-nowrap overflow-hidden"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="text-sm whitespace-nowrap"
                   >
                     {t(key as any)}
                   </motion.span>
                 )}
               </AnimatePresence>
-            </button>
+            </motion.button>
           )
         })}
       </nav>
