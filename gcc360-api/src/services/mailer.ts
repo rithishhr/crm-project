@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer'
 
 export const transporter = nodemailer.createTransport({
   host:   process.env.MAIL_HOST  || 'smtp.gmail.com',
-  port:   Number(process.env.MAIL_PORT) || 587,
+  port:   Number(process.env.MAIL_PORT) || 2525, // Port 2525 is a common alternative that bypasses most blocks
   secure: false,
   pool:   true,
   auth: {
