@@ -33,7 +33,10 @@ export async function sendMail(options: { to: string; subject: string; html?: st
         },
         signal: controller.signal,
         body: JSON.stringify({
-          from: process.env.MAIL_FROM || 'GCC360 CRM <onboarding@resend.dev>',
+          // Force onboarding@resend.dev if MAIL_FROM is a gmail address (Resend doesn't allow gmail)
+          from: (process.env.MAIL_FROM && !process.env.MAIL_FROM.includes('gmail.com')) 
+                ? process.env.MAIL_FROM 
+                : 'GCC360 CRM <onboarding@resend.dev>',
           to,
           subject,
           html: html || text,
