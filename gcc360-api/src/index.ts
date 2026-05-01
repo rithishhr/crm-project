@@ -104,10 +104,6 @@ app.get('/api/health', async (_req, res) => {
     version: '1.0.3',
     database: dbStatus,
     aiConfigured: !!process.env.GROQ_API_KEY,
-    emailConfig: {
-      smtp: !!process.env.MAIL_USER,
-      resend: !!process.env.RESEND_API_KEY,
-    },
     configs: {
       frontendUrl: frontendUrl,
       nodeEnv: process.env.NODE_ENV
