@@ -65,6 +65,7 @@
   --shadow-card:    0 4px 12px rgba(0,0,0,0.03);
   --shadow-hover:   0 12px 32px rgba(0,0,0,0.06);
   --input-bg:       #ffffff;
+  --table-head:     #f8fafc;
 }
 
 /* ── BASE ──────────────────────────────────────────────────────────────── */
@@ -74,102 +75,76 @@ body {
   background-color: var(--bg-base);
   color: var(--text-primary);
   margin: 0; padding: 0;
-  font-family: 'Inter', 'DM Sans', system-ui, sans-serif;
-  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow-x: hidden;
-}
-
-/* Animated Background Glows */
-body::before, body::after {
-  content: '';
-  position: fixed;
-  width: 50vw;
-  height: 50vw;
-  border-radius: 50%;
-  filter: blur(120px);
-  z-index: -1;
-  opacity: 0.15;
-  pointer-events: none;
-}
-
-body::before {
-  top: -10vw;
-  right: -10vw;
-  background: var(--accent);
-  animation: pulse-slow 8s infinite alternate;
-}
-
-body::after {
-  bottom: -10vw;
-  left: -10vw;
-  background: var(--role-analyst);
-  animation: pulse-slow 12s infinite alternate-reverse;
-}
-
-@keyframes pulse-slow {
-  from { opacity: 0.1; transform: scale(1) translate(0, 0); }
-  to { opacity: 0.2; transform: scale(1.2) translate(5%, 5%); }
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.4s ease;
+  letter-spacing: -0.01em;
 }
 
 @layer components {
-  /* Glassmorphism Panel */
-  .glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 1rem;
-    box-shadow: var(--shadow-card);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Official Card */
+  .official-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
   }
-  .glass-panel:hover {
+  .official-card:hover {
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
     border-color: var(--accent-border);
-    box-shadow: 0 8px 32px var(--glow-primary);
-    transform: translateY(-2px);
   }
 
-  /* Gen Z KPI Card */
+  /* Professional Data Table */
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .data-table th {
+    background-color: var(--table-head);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.25rem;
+    text-align: start;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 1.125rem 1.25rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+    background-color: transparent;
+    transition: background-color 0.15s ease;
+  }
+  .data-table tr:hover td {
+    background-color: var(--bg-elevated);
+  }
+  .data-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* KPI Card Refinement */
   .kpi-card {
-    @apply glass-panel;
-    padding: 1.5rem;
-    position: relative;
-    overflow: hidden;
+    @apply official-card p-6 flex flex-col items-center justify-center text-center;
+  }
+
+  /* Panel Refinement */
+  .panel {
+    @apply official-card overflow-hidden;
   }
   
-  .kpi-card::after {
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 100px; height: 100px;
-    background: linear-gradient(135deg, transparent 50%, var(--accent-muted) 100%);
-    opacity: 0.5;
-  }
-
-  /* Animated Sidebar */
-  .sidebar-item {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 bg-transparent;
-    color: var(--text-muted);
-  }
-  .sidebar-item:hover {
-    @apply scale-[1.02];
-    color: var(--text-primary);
-    background-color: var(--bg-hover);
-  }
-  .sidebar-item.active {
-    @apply font-bold shadow-lg shadow-teal-500/20;
-    color: #ffffff;
-    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-  }
-
-  /* Modern Buttons */
+  /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all duration-300;
-    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-    box-shadow: 0 4px 15px var(--glow-primary);
+    @apply inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200;
+    background: var(--accent);
+    color: #ffffff;
   }
   .btn-primary:hover {
-    @apply scale-[1.05] -translate-y-0.5 shadow-xl;
-    box-shadow: 0 8px 25px var(--glow-primary);
+    @apply shadow-lg -translate-y-0.5;
+    background: var(--accent-hover);
   }
-  .btn-primary:active { @apply scale-[0.98]; }
 }

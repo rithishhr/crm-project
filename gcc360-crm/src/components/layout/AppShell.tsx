@@ -249,21 +249,8 @@ export default function AppShell({ user, onLogout }: Props) {
           searchLoading={searchLoading}
           onSearchSelect={handleSearchSelect}
         />
-        <main className="flex-1 overflow-y-auto p-6 relative">
-          {/* Background Noise & Glows */}
-          <div className="fixed inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
-          
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentPage}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-            >
-              {renderPage()}
-            </motion.div>
-          </AnimatePresence>
+        <main className="flex-1 overflow-y-auto p-6">
+          {renderPage()}
         </main>
       </div>
       <AIAssistantPanel

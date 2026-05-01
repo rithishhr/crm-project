@@ -474,110 +474,107 @@ export default function ContactsPage({ canEdit, searchQuery, onSearchChange }: P
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Total Contacts', value: contacts.length,                                          color: '#14b8a6' },
-          { label: 'Active',         value: contacts.filter(c => c.status === 'ACTIVE').length,        color: '#10b981' },
-          { label: 'Companies',      value: uniqueCompanies,                                           color: '#3b82f6' },
-          { label: 'Decision Makers',value: contacts.filter(c => c.linkedOpportunities > 0).length,   color: '#f59e0b' },
+          { label: 'Total Contacts', value: contacts.length,                                          color: 'var(--accent)' },
+          { label: 'Active Status',  value: contacts.filter(c => c.status === 'ACTIVE').length,        color: '#10b981' },
+          { label: 'Client Base',    value: uniqueCompanies,                                           color: '#3b82f6' },
+          { label: 'Key Accounts',   value: contacts.filter(c => c.linkedOpportunities > 0).length,   color: '#f59e0b' },
         ].map(k => (
-          <div key={k.label} className="kpi-card text-center">
-            <p className="text-xl font-bold" style={{ color: k.color }}>{k.value}</p>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{k.label}</p>
+          <div key={k.label} className="official-card p-6 flex flex-col items-center">
+            <p className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{k.value}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest mt-1" style={{ color: 'var(--text-muted)' }}>{k.label}</p>
+            <div className="h-1 w-8 rounded-full mt-3" style={{ backgroundColor: k.color }} />
           </div>
         ))}
       </div>
 
-      {/* Search */}
-      <div className="panel p-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, company, email, title..." className="input-field pl-9 py-2 text-sm" />
+      {/* Search & Actions Bar */}
+      <div className="flex items-center gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+          <input 
+            value={search} 
+            onChange={e => setSearch(e.target.value)} 
+            placeholder="Search enterprise contacts..." 
+            className="input-field pl-11 py-3 bg-white" 
+            style={{ borderRadius: '0.75rem', border: '1px solid var(--border)' }}
+          />
         </div>
       </div>
 
-      {/* Table */}
-      <div className="panel overflow-hidden">
-        <table className="w-full data-table">
+      {/* Table Section */}
+      <div className="official-card overflow-hidden">
+        <table className="data-table">
           <thead>
             <tr>
-              <th className="w-10 pl-5">
-                <input type="checkbox" checked={selectedIds.length === filtered.length && filtered.length > 0} onChange={toggleSelectAll} className="rounded border-gray-700 bg-gray-800" />
+              <th className="w-12 text-center">
+                <input type="checkbox" checked={selectedIds.length === filtered.length && filtered.length > 0} onChange={toggleSelectAll} className="rounded border-slate-300" />
               </th>
-              <th>Contact</th>
-              <th>Title / Department</th>
-              <th>Company</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Status</th>
-              <th>Last Activity</th>
-              <th style={{ width: 90 }}>Actions</th>
+              <th>Contact Name</th>
+              <th>Position & Dept</th>
+              <th>Organization</th>
+              <th>Communication</th>
+              <th className="text-center">Status</th>
+              <th className="text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map((contact, i) => {
-              const st      = STATUS_CFG[contact.status as keyof typeof STATUS_CFG] || STATUS_CFG.ACTIVE
+            {filtered.map((contact) => {
+              const st = STATUS_CFG[contact.status as keyof typeof STATUS_CFG] || STATUS_CFG.ACTIVE
               const initials = `${contact.firstName?.[0] || ''}${contact.lastName?.[0] || ''}`.toUpperCase()
               return (
-                <tr key={contact.id} className={`group hover:bg-[var(--bg-elevated)] transition-colors cursor-pointer ${selectedIds.includes(contact.id) ? 'bg-accent-muted/20' : ''}`} onClick={() => setSelected(contact)}>
-                  <td className="pl-5" onClick={e => e.stopPropagation()}>
-                    <input type="checkbox" checked={selectedIds.includes(contact.id)} onChange={() => toggleSelect(contact.id)} className="rounded border-gray-700 bg-gray-800" />
+                <tr key={contact.id} className="cursor-pointer" onClick={() => setSelected(contact)}>
+                  <td className="text-center" onClick={e => e.stopPropagation()}>
+                    <input type="checkbox" checked={selectedIds.includes(contact.id)} onChange={() => toggleSelect(contact.id)} className="rounded border-slate-300" />
                   </td>
                   <td>
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                        style={{ background: 'linear-gradient(135deg, #14b8a6, #3b82f6)' }}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200">
                         {initials}
                       </div>
-                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                        {contact.firstName} {contact.lastName}
-                      </p>
+                      <div>
+                        <p className="font-semibold text-slate-900">{contact.firstName} {contact.lastName}</p>
+                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">{contact.ownerId || 'Unassigned'}</p>
+                      </div>
                     </div>
                   </td>
                   <td>
-                    <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>{contact.jobTitle || '—'}</p>
-                    {contact.department && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{contact.department}</p>}
-                  </td>
-                  <td><p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{contact.client?.name || contact.company || '—'}</p></td>
-                  <td>
-                    <a href={`mailto:${contact.email}`} onClick={e => e.stopPropagation()}
-                      className="text-xs flex items-center gap-1 hover:underline" style={{ color: 'var(--accent)' }}>
-                      <Mail className="w-3 h-3" />{contact.email}
-                    </a>
+                    <p className="text-sm font-medium text-slate-700">{contact.jobTitle || '—'}</p>
+                    <p className="text-[11px] text-slate-400">{contact.department || 'General'}</p>
                   </td>
                   <td>
-                    {contact.phone && (
-                      <a href={`tel:${contact.phone}`} onClick={e => e.stopPropagation()} className="text-xs flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
-                        <Phone className="w-3 h-3" />{contact.phone}
-                      </a>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                      <p className="text-sm text-slate-600 font-medium">{contact.client?.name || contact.company || '—'}</p>
+                    </div>
                   </td>
                   <td>
-                    <span className="badge text-xs" style={{ backgroundColor: st.bg, color: st.color, border: `1px solid ${st.border}` }}>{st.label}</span>
-                  </td>
-                  <td>
-                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                      {contact.lastActivity ? new Date(contact.lastActivity).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '—'}
-                    </p>
-                  </td>
-                  <td onClick={e => e.stopPropagation()}>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => setMailItem(contact)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-blue-500/10 transition-colors"
-                        title="Email" style={{ color: 'var(--text-muted)' }}>
-                        <Mail className="w-3.5 h-3.5" />
-                      </button>
-                      {canEdit && (
-                        <>
-                          <button onClick={() => { setEditItem(contact); setShowForm(true) }} className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
-                            style={{ color: 'var(--text-muted)' }} title="Edit">
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
-                          <button onClick={() => handleDelete(contact.id)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-red-500/10 transition-colors"
-                            style={{ color: 'var(--text-muted)' }} title="Delete">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-teal-600 font-medium">
+                        <Mail className="w-3 h-3" /> {contact.email}
+                      </div>
+                      {contact.phone && (
+                        <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                          <Phone className="w-3 h-3" /> {contact.phone}
+                        </div>
                       )}
+                    </div>
+                  </td>
+                  <td className="text-center">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border" 
+                      style={{ backgroundColor: st.bg, color: st.color, borderColor: st.border }}>
+                      {st.label}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+                      <button onClick={() => setMailItem(contact)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-teal-600 transition-colors">
+                        <Mail className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => { setEditItem(contact); setShowForm(true) }} className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors">
+                        <Edit3 className="w-4 h-4" />
+                      </button>
                     </div>
                   </td>
                 </tr>

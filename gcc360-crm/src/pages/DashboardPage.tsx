@@ -136,175 +136,152 @@ export default function DashboardPage({ user, onNavigate }: Props) {
       </div>
 
       {/* Smart CRM Analytics AI */}
-      <FadeIn delay={0.1}>
-        <div className="panel p-5 glass-panel">
-          {/* ... existing content ... */}
-          <div className="flex items-center justify-between gap-4 mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0ea5e9, #14b8a6)' }}>
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="font-semibold" style={{ color: 'var(--text-primary)' }}>Smart CRM Analytics AI</h2>
-                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Auto summary of what happened while you were away</p>
-              </div>
+      <div className="official-card p-6 mb-6">
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-inner" style={{ background: 'linear-gradient(135deg, #0ea5e9, #14b8a6)' }}>
+              <Bot className="w-6 h-6 text-white" />
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={speakSummary} className="btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" disabled={!aiSummary?.summaryText}>
-                <Volume2 className="w-3.5 h-3.5" /> {speaking ? 'Stop' : 'Read My CRM Summary'}
-              </button>
-              <button onClick={exportSummaryPdf} className="btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" disabled={!aiSummary}>
-                <Download className="w-3.5 h-3.5" /> Export PDF
-              </button>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">Intelligent CRM Summary</h2>
+              <p className="text-xs text-slate-500 font-medium tracking-tight">Automated business intelligence for your daily briefing</p>
             </div>
           </div>
-
-          {aiLoading ? (
-            <div className="text-sm" style={{ color: 'var(--text-muted)' }}>Analyzing CRM data...</div>
-          ) : aiSummary ? (
-            <div className="space-y-3">
-              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{aiSummary.greeting}</p>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{aiSummary.summaryText}</p>
-              {aiSummary.aiNarrative && (
-                <div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
-                  <p className="text-xs whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>{aiSummary.aiNarrative}</p>
-                </div>
-              )}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {[
-                  { label: 'Hot Leads', value: aiSummary.metrics?.hotLeads || 0 },
-                  { label: 'Leads Won', value: aiSummary.metrics?.leadsWon || 0 },
-                  { label: 'Leads Lost', value: aiSummary.metrics?.leadsLost || 0 },
-                  { label: 'Pending Follow-ups', value: aiSummary.metrics?.pendingFollowUps || 0 },
-                  { label: 'Tasks Overdue', value: aiSummary.metrics?.tasksOverdue || 0 },
-                  { label: 'Deals Closed (Month)', value: aiSummary.metrics?.dealsClosedThisMonth || 0 },
-                  { label: 'Revenue (Month)', value: fmt(aiSummary.metrics?.revenueGenerated || 0) },
-                  { label: 'Emails Sent', value: aiSummary.metrics?.emailsSent || 0 },
-                ].map((item, idx) => (
-                  <motion.div 
-                    key={item.label} 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 + idx * 0.05 }}
-                    className="rounded-lg p-2.5" 
-                    style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border)' }}
-                  >
-                    <p className="text-[10px] uppercase" style={{ color: 'var(--text-muted)' }}>{item.label}</p>
-                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{item.value}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>AI summary unavailable right now.</p>
-          )}
+          <div className="flex items-center gap-2">
+            <button onClick={speakSummary} className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition-colors flex items-center gap-2" disabled={!aiSummary?.summaryText}>
+              <Volume2 className="w-3.5 h-3.5" /> {speaking ? 'Stop' : 'Play Audio'}
+            </button>
+            <button onClick={exportSummaryPdf} className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition-colors flex items-center gap-2" disabled={!aiSummary}>
+              <Download className="w-3.5 h-3.5" /> PDF
+            </button>
+          </div>
         </div>
-      </FadeIn>
+
+        {aiLoading ? (
+          <div className="flex items-center gap-3 text-sm text-slate-400 py-4">
+            <Loader2 className="w-4 h-4 animate-spin text-teal-500" />
+            Synthesizing intelligence report...
+          </div>
+        ) : aiSummary ? (
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl border border-teal-100 bg-teal-50/30">
+              <p className="text-sm font-bold text-teal-900 mb-1">{aiSummary.greeting}</p>
+              <p className="text-sm leading-relaxed text-teal-800">{aiSummary.summaryText}</p>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { label: 'High Priority Leads', value: aiSummary.metrics?.hotLeads || 0 },
+                { label: 'Monthly Wins', value: aiSummary.metrics?.leadsWon || 0 },
+                { label: 'Retention Risk', value: aiSummary.metrics?.leadsLost || 0 },
+                { label: 'Follow-ups', value: aiSummary.metrics?.pendingFollowUps || 0 },
+                { label: 'System Overdue', value: aiSummary.metrics?.tasksOverdue || 0 },
+                { label: 'Closures (MTD)', value: aiSummary.metrics?.dealsClosedThisMonth || 0 },
+                { label: 'Revenue Intake', value: fmt(aiSummary.metrics?.revenueGenerated || 0) },
+                { label: 'Comm. Volume', value: aiSummary.metrics?.emailsSent || 0 },
+              ].map((item) => (
+                <div key={item.label} className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
+                  <p className="text-sm font-black text-slate-800">{item.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-400 italic">No intelligence briefing available for the current cycle.</p>
+        )}
+      </div>
 
       {/* KPI Cards */}
-      <motion.div 
-        variants={{
-          show: { transition: { staggerChildren: 0.1 } }
-        }}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-      >
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Pipeline Value',  value: fmt(kpis.pipelineValue || 0), icon: DollarSign, color: '#14b8a6', change: '+18%', up: true },
-          { label: 'Total Revenue',   value: fmt(kpis.totalRevenue  || 0), icon: TrendingUp, color: '#10b981', change: '+12%', up: true },
-          { label: 'Total Leads',     value: String(kpis.totalLeads || 0), icon: Target,     color: '#3b82f6', change: `${kpis.conversionRate || 0}% converted`, up: true },
-          { label: 'Active Clients',  value: String(kpis.clients    || 0), icon: Users2,     color: '#f59e0b', change: `${kpis.totalDeals || 0} deals`, up: true },
+          { label: 'Pipeline Value',  value: fmt(kpis.pipelineValue || 0), icon: DollarSign, color: '#0ea5e9' },
+          { label: 'Total Revenue',   value: fmt(kpis.totalRevenue  || 0), icon: TrendingUp, color: '#10b981' },
+          { label: 'Active Leads',     value: String(kpis.totalLeads || 0), icon: Target,     color: '#6366f1' },
+          { label: 'Client Base',  value: String(kpis.clients    || 0), icon: Users2,     color: '#f59e0b' },
         ].map((kpi) => (
-          <motion.div 
-            key={kpi.label} 
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              show: { opacity: 1, y: 0 }
-            }}
-            whileHover={{ scale: 1.02, translateY: -5 }}
-            className="kpi-card"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{kpi.label}</p>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${kpi.color}15` }}>
-                <kpi.icon className="w-4 h-4" style={{ color: kpi.color }} />
+          <div key={kpi.label} className="official-card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50 border border-slate-100">
+                <kpi.icon className="w-5 h-5" style={{ color: kpi.color }} />
+              </div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live</span>
+            </div>
+            <p className="text-2xl font-bold text-slate-900 tracking-tight">{kpi.value}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase mt-1">{kpi.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="official-card p-6 lg:col-span-2">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">Revenue Performance</h2>
+              <p className="text-xs text-slate-500">Monthly breakdown of gross revenue across all sectors</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-100">
+                <div className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+                <span className="text-[10px] font-bold text-teal-700 uppercase">Growth</span>
               </div>
             </div>
-            <p className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{kpi.value}</p>
-            <p className="text-xs font-medium" style={{ color: kpi.up ? '#10b981' : '#ef4444' }}>{kpi.change}</p>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Revenue chart */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="panel p-5 lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold" style={{ color: 'var(--text-primary)' }}>Revenue Trend</h2>
-            <BarChart2 className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
           </div>
           {revenue.length > 0 ? (
-            <ResponsiveContainer width="100%" height={180}>
+            <ResponsiveContainer width="100%" height={220}>
               <LineChart data={revenue}>
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false}
+                <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} axisLine={false} tickLine={false}
                   tickFormatter={v => v >= 1000000 ? `${(v/1000000).toFixed(0)}M` : `${(v/1000).toFixed(0)}K`} />
-                <Tooltip formatter={(v: number) => [fmt(v), 'Revenue']}
-                  contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8 }} />
-                <Line type="monotone" dataKey="amount" stroke="#14b8a6" strokeWidth={2.5} dot={false} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  itemStyle={{ fontSize: 12, fontWeight: 600 }}
+                />
+                <Line type="monotone" dataKey="amount" stroke="#14b8a6" strokeWidth={3} dot={{ r: 4, fill: '#14b8a6', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-44 flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>
-              <p className="text-sm">No revenue data yet. Create invoices to see your trend.</p>
+            <div className="h-56 flex flex-col items-center justify-center text-slate-400">
+              <BarChart2 className="w-8 h-8 mb-2 opacity-20" />
+              <p className="text-sm font-medium">Insufficient data for revenue modeling</p>
             </div>
           )}
-        </motion.div>
+        </div>
 
-        {/* Pipeline stages */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="panel p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold" style={{ color: 'var(--text-primary)' }}>Pipeline Stages</h2>
-          </div>
+        <div className="official-card p-6">
+          <h2 className="text-lg font-bold text-slate-900 mb-1">Pipeline Health</h2>
+          <p className="text-xs text-slate-500 mb-6">Distribution by deal stage</p>
           {stages.filter((s: any) => s.count > 0).length > 0 ? (
-            <>
-              <ResponsiveContainer width="100%" height={120}>
+            <div className="space-y-4">
+              <ResponsiveContainer width="100%" height={140}>
                 <PieChart>
-                  <Pie data={stages.filter((s: any) => s.count > 0)} dataKey="value" nameKey="stage"
-                    cx="50%" cy="50%" innerRadius={35} outerRadius={55}>
+                  <Pie data={stages.filter((s: any) => s.count > 0)} dataKey="value" nameKey="stage" innerRadius={45} outerRadius={65} paddingAngle={5}>
                     {stages.filter((s: any) => s.count > 0).map((s: any) => (
-                      <Cell key={s.stage} fill={STAGE_COLORS[s.stage] || '#6b7280'} />
+                      <Cell key={s.stage} fill={STAGE_COLORS[s.stage] || '#94a3b8'} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(v: number) => [fmt(v), 'Value']}
-                    contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8 }} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-1.5 mt-2">
+              <div className="grid grid-cols-1 gap-2 pt-2">
                 {stages.filter((s: any) => s.count > 0).map((s: any) => (
-                  <div key={s.stage} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: STAGE_COLORS[s.stage] || '#6b7280' }} />
-                      <span style={{ color: 'var(--text-secondary)' }}>{s.stage.replace('_', ' ')}</span>
+                  <div key={s.stage} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: STAGE_COLORS[s.stage] || '#94a3b8' }} />
+                      <span className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">{s.stage.replace('_', ' ')}</span>
                     </div>
-                    <span className="font-semibold" style={{ color: 'var(--text-muted)' }}>{s.count}</span>
+                    <span className="text-xs font-black text-slate-900">{s.count}</span>
                   </div>
                 ))}
               </div>
-            </>
+            </div>
           ) : (
-            <div className="h-40 flex items-center justify-center">
-              <div className="text-center">
-                <p className="text-sm mb-2" style={{ color: 'var(--text-muted)' }}>No opportunities yet.</p>
-                <button onClick={() => onNavigate('opportunities')} className="btn-primary text-xs px-3 py-1.5">
-                  Add First Opportunity
-                </button>
-              </div>
+            <div className="h-48 flex flex-col items-center justify-center text-slate-400 text-center">
+              <Target className="w-8 h-8 mb-2 opacity-20" />
+              <p className="text-sm font-medium px-4">No active opportunities in the pipeline</p>
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
 
       {/* Quick actions */}
